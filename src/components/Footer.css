@@ -1,9 +1,10 @@
 .footer {
   background: linear-gradient(180deg, #0a6b3c 0%, #075c3c 100%);
   color: #e6ffe6;
-  padding: 2.5rem 0 0.5rem 0;
+  /* reduced top padding and removed top margin so footer sits flush */
+  padding: 1.5rem 0 0.5rem 0;
   font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-  margin-top: 3rem;
+  margin-top: 0;
 }
 
 .footer-main {

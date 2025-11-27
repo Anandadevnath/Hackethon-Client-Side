@@ -1,9 +1,12 @@
-
-
-
 import './styles/App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import HeroBanner from './components/HeroBanner';
+import FeaturesSection from './components/FeaturesSection';
+import StatsSection from './components/StatsSection';
+import CrisisSection from './components/CrisisSection';
+import HowItWorks from './components/HowItWorks';
+import CallToAction from './components/CallToAction';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -21,7 +24,14 @@ function App() {
 					<Route path="/register" element={<Register />} />
 					<Route path="/profile" element={<Profile />} />
 					{/* Add other routes here */}
-					<Route path="/" element={null} />
+					<Route path="/" element={<>
+							<HeroBanner />
+							<FeaturesSection />
+							<StatsSection />
+							<CrisisSection />
+							<HowItWorks />
+							<CallToAction />
+						</>} />
 				</Routes>
 				<Footer />
 			</Router>

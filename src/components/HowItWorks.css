@@ -1,0 +1,28 @@
+.how{
+  background: linear-gradient(180deg,#f3fff8 0%, #ecfff4 100%);
+  padding: 64px 16px 80px;
+}
+.how__inner{ max-width:1180px; margin:0 auto; }
+.how__header{ text-align:center; margin-bottom:18px; }
+.how__icon{ width:72px; height:72px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; background:#eaffef; color:#028a3e; font-size:28px; box-shadow: 0 12px 30px rgba(2,138,62,0.06); }
+.how__title{ font-size:36px; margin:14px 0 6px; color:#0a6136; }
+.how__subtitle{ color:#2c6b4a; opacity:0.8; }
+
+.how__badges{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:26px 0 34px; }
+.badge{ background:#fff; border-radius:14px; padding:12px 18px; box-shadow: 0 8px 20px rgba(3,120,64,0.06); color:#0a6b3a; font-weight:600; font-size:14px; }
+
+.how__steps{ display:grid; grid-template-columns: repeat(4, 1fr); gap:22px; }
+.step-card{ background:#fff; border-radius:14px; overflow:hidden; box-shadow: 0 22px 50px rgba(3,50,30,0.06); }
+.step-card__media{ height:160px; background-size:cover; background-position:center; position:relative; }
+.step-card__num{ position:absolute; right:10px; top:10px; width:36px; height:36px; border-radius:999px; background:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; box-shadow: 0 8px 20px rgba(3,50,30,0.08); }
+.step-card__body{ padding:18px 20px 24px; }
+.step-card__title{ font-size:18px; font-weight:800; margin-bottom:8px; }
+.step-card__desc{ color:#697a6f; font-size:14px; line-height:1.6; }
+
+@media (max-width:1100px){
+  .how__steps{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width:700px){
+  .how__steps{ grid-template-columns: 1fr; }
+  .badge{ width:100%; justify-content:center; }
+}
