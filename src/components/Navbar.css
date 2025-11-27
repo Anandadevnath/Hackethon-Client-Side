@@ -89,3 +89,75 @@
 .navbar-cta:hover {
   background: linear-gradient(90deg, #ffeeb0 0%, #fffbe6 100%);
 }
+
+/* profile area */
+.navbar-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #fffbe6;
+}
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.12);
+}
+.profile-avatar.fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.15);
+  color: #fffbe6;
+  font-weight: 700;
+}
+.profile-name {
+  color: #fffbe6;
+  font-weight: 600;
+}
+.profile-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #ffffff;
+  color: #0a4d2c;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 40;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+}
+.profile-menu-item {
+  padding: 0.8rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.profile-menu-item:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+/* open state controlled by JS class to avoid hover fragility */
+.profile-menu.open {
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}

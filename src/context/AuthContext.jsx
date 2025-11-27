@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) || 'http://localhost:8000';
 
@@ -114,8 +114,68 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (updates) => {
+    setLoading(true);
+    setMessage('');
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const headers = { 'Content-Type': 'application/json' };
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
+      const res = await fetch(`${API_BASE}/user/update`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(updates)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        // controller returns updated farmer in data
+        if (data.data) setUser(data.data);
+        setMessage(data.message || 'Profile updated');
+        setLoading(false);
+        return { ok: true, data };
+      }
+      setMessage(data.message || 'Update failed');
+      setLoading(false);
+      return { ok: false, data };
+    } catch (err) {
+      setMessage('Update error');
+      setLoading(false);
+      return { ok: false, error: err };
+    }
+  };
+
+  // on mount, try to restore user from token
+  useEffect(() => {
+    const tryRestore = async () => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) return;
+      try {
+        const res = await fetch(`${API_BASE}/user/me`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+          credentials: 'include'
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data && data.data) {
+          setUser(data.data);
+        } else {
+          // token might be invalid/expired -> clear stored tokens
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+        }
+      } catch (err) {
+        // network error or other - clear tokens to avoid stale state
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      }
+    };
+    tryRestore();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, message, loading, register, login, logout, setMessage }}>
+    <AuthContext.Provider value={{ user, message, loading, register, login, logout, updateProfile, setMessage }}>
       {children}
     </AuthContext.Provider>
   );
