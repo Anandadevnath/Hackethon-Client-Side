@@ -21,6 +21,9 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
+        // persist tokens if returned
+        if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
+        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
         setMessage(data.message || 'Registered successfully');
         // Optionally set user from response (controller returns payload in `data`)
         if (data.data) setUser(data.data);
@@ -55,7 +58,10 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setUser(data.user || { email: payload.email || payload.username });
+        // persist tokens
+        if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
+        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+        setUser(data.user || data.data || { email: payload.email || payload.username });
         setMessage(data.message || 'Logged in successfully');
         setLoading(false);
         return { ok: true, data };
@@ -74,15 +80,29 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setMessage('');
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      const headers = {};
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
       const res = await fetch(`${API_BASE}/user/logout`, {
         method: 'POST',
         credentials: 'include',
+        headers
       });
       if (res.ok) {
+        // clear stored tokens
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         setUser(null);
         setMessage('Logged out successfully');
         setLoading(false);
         return { ok: true };
+      }
+      // if unauthorized, also clear local tokens to avoid stale state
+      if (res.status === 401) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setUser(null);
       }
       setMessage('Logout failed');
       setLoading(false);
