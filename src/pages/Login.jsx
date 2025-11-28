@@ -35,7 +35,7 @@ const Login = () => {
           </div>
 
           <div className="w-full flex justify-end mb-4">
-            <a href="#" className="text-[#009e5c] font-semibold no-underline">Forgot Password?</a>
+            <Link to="/forgot" className="text-[#009e5c] font-semibold no-underline">Forgot Password?</Link>
           </div>
 
           <button type="submit" className="w-full bg-[#009e5c] text-white font-bold text-base rounded-[14px] py-3 mb-4 shadow-[0_6px_18px_rgba(0,0,0,0.08)]">Login to Dashboard</button>

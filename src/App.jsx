@@ -9,6 +9,7 @@ import HowItWorks from "./components/HowItWorks";
 import CallToAction from "./components/CallToAction";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import Warnings from "./pages/Warnings";
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/warnings" element={<Warnings />} />
