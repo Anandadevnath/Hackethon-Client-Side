@@ -1,6 +1,6 @@
 import React from "react";
 import "./Footer.css";
-import logo from "./assets/react.svg";
+import logo from "./assets/Gemini_Generated_Image_ld4a7tld4a7tld4a-removebg-preview.png";
 
 const Footer = () => (
   <footer className="footer">

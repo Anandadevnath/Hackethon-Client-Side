@@ -1,14 +1,14 @@
-
-import React, { useRef, useState, useEffect } from "react";
-import logoEn from "../assets/Gemini_Generated_Image_ppkkebppkkebppkk-removebg-preview.png";
-import logoBn from "../assets/Gemini_Generated_Image_ld4a7tld4a7tld4a-removebg-preview.png";
+import React, { useRef, useEffect, useState } from "react";
+import logoEn from "../assets/Gemini_Generated_Image_ld4a7tld4a7tld4a-removebg-preview.png";
+import logoBn from "../assets/Gemini_Generated_Image_ppkkebppkkebppkk-removebg-preview.png";
+import { useLanguage } from "../context/LanguageContext";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [lang, setLang] = useState('en');
+  const { lang, setLang } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const wrapperRef = useRef(null);
@@ -41,11 +41,11 @@ const Navbar = () => {
   return (
     <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-60 box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159,240,177,0.138)_0%,rgba(154,255,126,0.114)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
       <div className="max-w-[1400px] mx-auto px-7 flex items-center justify-between min-h-[72px]">
-        <div className="flex items-center">
           <div className="flex items-center">
-            <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-[77px] block" />
+            <div className="flex items-center">
+              <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-[77px] block" />
+            </div>
           </div>
-        </div>
         <div className="flex items-center gap-4">
           <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
             <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
