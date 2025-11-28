@@ -15,7 +15,7 @@ export default function HeroBanner() {
         style={{ backgroundImage: bgImage }}
       />
 
-      <div className="relative z-10 w-full max-w-[1360px] mx-auto grid gap-9 px-7 py-24 items-center md:grid-cols-2">
+      <div className="relative z-10 w-full max-w-[1360px] mx-auto grid gap-9 px-4 py-24 items-center md:grid-cols-2">
         <div className="text-white">
           <div className="">
             <div className="w-18 h-18 bg-white/95 text-[#26723a] rounded-lg flex items-center justify-center text-2xl shadow-[0_12px_40px_rgba(0,0,0,0.35)]">🌾</div>

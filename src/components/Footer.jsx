@@ -18,15 +18,15 @@ export default function Footer() {
 
       <div className="max-w-[1200px] mx-auto flex flex-wrap justify-between gap-16 relative px-4">
 
-        {/* BRAND COLUMN — FIXED LAYOUT */}
-        <div className="flex-1 min-w-[300px]">
+        {/* BRAND COLUMN — responsive on very small screens */}
+        <div className="flex-1 w-full md:min-w-[300px] min-w-0">
 
           {/* Large Logo */}
           <motion.img
             whileHover={{ scale: 1.04 }}
             src={isBn ? logoBn : logoEn}
             alt="HarvestGuard"
-            className="w-40 h-40 object-contain mb-0 drop-shadow-lg"
+            className="w-28 h-28 md:w-40 md:h-40 object-contain mb-0 drop-shadow-lg max-w-full"
           />
 
           {/* Description */}
@@ -42,7 +42,7 @@ export default function Footer() {
           </div>
 
           {/* Social Icons */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             {["\uf09a", "\uf099", "\uf16d", "\uf167"].map((icon, i) => (
               <motion.a
                 key={i}
@@ -58,7 +58,7 @@ export default function Footer() {
         </div>
 
         {/* LINKS COLUMN */}
-        <div className="flex-1 min-w-[280px]  flex justify-between gap-12">
+        <div className="flex-1 w-full md:min-w-[280px] min-w-0 flex flex-col md:flex-row md:justify-between gap-6 md:gap-12">
 
           {[
             {

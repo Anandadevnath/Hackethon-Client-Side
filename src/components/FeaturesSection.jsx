@@ -12,10 +12,10 @@ export default function FeaturesSection() {
   };
 
   return (
-    <section className="relative py-20 px-5 bg-gradient-to-b from-[#e9fff4] via-[#f3fff9] to-[#e7ffee] overflow-hidden">
+    <section className="relative py-20 px-4 bg-gradient-to-b from-[#e9fff4] via-[#f3fff9] to-[#e7ffee] overflow-hidden">
 
-      {/* Soft Glowing Blobs */}
-      <div className="pointer-events-none absolute inset-0">
+      {/* Soft Glowing Blobs (hidden on very small screens) */}
+      <div className="pointer-events-none absolute inset-0 hidden md:block">
         <div className="absolute top-10 left-10 w-60 h-60 bg-green-300/40 rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-72 h-72 bg-emerald-300/40 rounded-full blur-[100px]"></div>
       </div>

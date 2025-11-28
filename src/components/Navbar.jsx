@@ -41,7 +41,7 @@ const Navbar = () => {
 
   return (
     <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-60 box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159,240,177,0.138)_0%,rgba(154,255,126,0.114)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
-      <div className="max-w-[1400px] mx-auto px-7 py-0 flex items-center justify-between min-h-[72px]">
+      <div className="max-w-[1400px] mx-auto px-4 py-0 flex items-center justify-between min-h-[72px]">
           <div className="flex items-center">
             <div className="flex items-center">
               <Link to="/" className="inline-block">
@@ -96,7 +96,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile menu panel */}
-      <div className={`md:hidden px-6 pb-4 transition-max-h duration-300 overflow-hidden ${mobileOpen ? 'max-h-[400px] ease-out' : 'max-h-0'}`}>
+      <div className={`md:hidden px-4 pb-4 transition-max-h duration-300 overflow-hidden ${mobileOpen ? 'max-h-[400px] ease-out' : 'max-h-0'}`}>
         <div className="flex flex-col gap-3 pt-3">
           <button onClick={() => { setLang(l => l === 'en' ? 'bn' : 'en'); setMobileOpen(false); }} className="flex items-center gap-2 text-sm text-[#fffbe6]">
             <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
