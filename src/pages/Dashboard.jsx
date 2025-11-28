@@ -179,7 +179,7 @@ export default function Dashboard() {
           )}°C`,
           humidity: humidity,
           rainfall: `${days[0]?.precip_prob ?? 0}%`,
-          location: name,
+          location: geo?.display_name || name,
           fetched: true,
         }));
         setForecast(days);
@@ -433,7 +433,6 @@ export default function Dashboard() {
                 </div>
               ) : (
                 crops.map((c, i) => {
-                  // normalize fields that may be in different shapes
                   const id = c._id ?? c.id ?? i;
                   const cropType = c.cropType ?? c.type ?? "Crop";
                   const weight = c.estimatedWeightKg ?? c.weight ?? "";
@@ -448,6 +447,7 @@ export default function Dashboard() {
                         }${c.storageLocation.district || ""}`
                       : c.storageLocation || "";
                   const risk = c.risk || c.priority || c.status || "Low";
+
                   return (
                     <motion.div
                       key={id}
@@ -456,7 +456,6 @@ export default function Dashboard() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-11 h-11 rounded-xl bg-[#eaf7ee] flex items-center justify-center text-[#0aa05a]">
-                          {/* simple box icon */}
                           <svg
                             width="18"
                             height="18"
@@ -490,12 +489,26 @@ export default function Dashboard() {
                         </div>
                       </div>
 
+                      {/* RIGHT SIDE → Risk badge + Edit/Delete buttons */}
                       <div className="flex items-center gap-3">
-                        <div>
-                          <RiskBadge
-                            level={c.risk || c.priority || c.status || "Low"}
-                          />
-                        </div>
+                        {/* Risk Badge */}
+                        <RiskBadge level={risk} />
+
+                        {/* Edit Button */}
+                        <button
+                          className="text-blue-600 text-xs font-medium hover:underline"
+                          onClick={() => openEditModal(c)}
+                        >
+                          Edit
+                        </button>
+
+                        {/* Delete Button */}
+                        <button
+                          className="text-red-600 text-xs font-medium hover:underline"
+                          onClick={() => deleteCrop(id)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </motion.div>
                   );
