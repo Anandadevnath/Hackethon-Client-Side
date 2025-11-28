@@ -4,7 +4,7 @@ export default function HeroBanner() {
   const bgImage = "linear-gradient(180deg, rgba(2, 20, 12, 0.35), rgba(4, 10, 6, 0.55)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f')";
 
   return (
-    <section className="relative min-h-[92vh] flex items-center text-white overflow-hidden">
+    <section className="relative min-h-[96vh] flex items-center text-white overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center saturate-[0.95] brightness-[0.7] z-0"
         style={{ backgroundImage: bgImage }}

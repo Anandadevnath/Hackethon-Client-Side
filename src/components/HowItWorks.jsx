@@ -1,5 +1,4 @@
 import React from 'react';
-import './HowItWorks.css';
 
 export default function HowItWorks(){
   const steps = [
@@ -30,30 +29,30 @@ export default function HowItWorks(){
   ];
 
   return (
-    <section className="how">
-      <div className="how__inner">
-        <div className="how__header">
-          <div className="how__icon">✔️</div>
-          <h2 className="how__title">How HarvestGuard Works</h2>
-          <p className="how__subtitle">Four simple steps to save our harvest</p>
+    <section className="bg-[linear-gradient(180deg,#f3fff8_0%,#ecfff4_100%)] py-16 px-4">
+      <div className="max-w-[1180px] mx-auto">
+        <div className="text-center mb-4">
+          <div className="inline-flex w-18 h-18 rounded-full items-center justify-center bg-[#eaffef] text-[#028a3e] text-2xl shadow-[0_12px_30px_rgba(2,138,62,0.06)]">✔️</div>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#0a6136] mt-4 mb-2">How HarvestGuard Works</h2>
+          <p className="text-[#2c6b4a] opacity-80">Four simple steps to save our harvest</p>
         </div>
 
-        <div className="how__badges">
-          <span className="badge">60% Reduction in Post-Harvest Losses</span>
-          <span className="badge">Real-Time Monitoring &amp; Alerts</span>
-          <span className="badge">AI-Powered Crop Health Analysis</span>
-          <span className="badge">Increased Farmer Income by 40%</span>
+        <div className="flex gap-3 justify-center flex-wrap my-6">
+          <span className="bg-white rounded-lg px-4 py-3 shadow-[0_8px_20px_rgba(3,120,64,0.06)] text-[#0a6b3a] font-semibold text-sm">60% Reduction in Post-Harvest Losses</span>
+          <span className="bg-white rounded-lg px-4 py-3 shadow-[0_8px_20px_rgba(3,120,64,0.06)] text-[#0a6b3a] font-semibold text-sm">Real-Time Monitoring &amp; Alerts</span>
+          <span className="bg-white rounded-lg px-4 py-3 shadow-[0_8px_20px_rgba(3,120,64,0.06)] text-[#0a6b3a] font-semibold text-sm">AI-Powered Crop Health Analysis</span>
+          <span className="bg-white rounded-lg px-4 py-3 shadow-[0_8px_20px_rgba(3,120,64,0.06)] text-[#0a6b3a] font-semibold text-sm">Increased Farmer Income by 40%</span>
         </div>
 
-        <div className="how__steps">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {steps.map(step => (
-            <article key={step.id} className="step-card">
-              <div className="step-card__media" style={{backgroundImage:`url(${step.img})`}}>
-                <div className="step-card__num">{step.id}</div>
+            <article key={step.id} className="bg-white rounded-lg overflow-hidden shadow-[0_22px_50px_rgba(3,50,30,0.06)]">
+              <div className="h-40 bg-cover bg-center relative" style={{backgroundImage:`url(${step.img})`}}>
+                <div className="absolute right-2 top-2 w-9 h-9 rounded-full bg-white flex items-center justify-center font-bold shadow-[0_8px_20px_rgba(3,50,30,0.08)]">{step.id}</div>
               </div>
-              <div className="step-card__body">
-                <h3 className="step-card__title">{step.title}</h3>
-                <p className="step-card__desc">{step.desc}</p>
+              <div className="p-4 md:p-5">
+                <h3 className="text-lg font-extrabold mb-2">{step.title}</h3>
+                <p className="text-[#697a6f] text-sm leading-6">{step.desc}</p>
               </div>
             </article>
           ))}

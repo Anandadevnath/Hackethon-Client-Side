@@ -21,17 +21,14 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        // persist tokens if returned
         if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
         if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
         setMessage(data.message || 'Registered successfully');
-        // Optionally set user from response (controller returns payload in `data`)
         if (data.data) setUser(data.data);
         if (data.user) setUser(data.user);
         setLoading(false);
         return { ok: true, data };
       }
-      // surface validation errors if present
       if (data && data.errors && Array.isArray(data.errors)) {
         setMessage(data.errors.join(', '));
       } else {
@@ -58,7 +55,6 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        // persist tokens
         if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
         if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
         setUser(data.user || data.data || { email: payload.email || payload.username });
@@ -90,7 +86,6 @@ export const AuthProvider = ({ children }) => {
         headers
       });
       if (res.ok) {
-        // clear stored tokens
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         setUser(null);
@@ -98,7 +93,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return { ok: true };
       }
-      // if unauthorized, also clear local tokens to avoid stale state
       if (res.status === 401) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -130,7 +124,6 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        // controller returns updated farmer in data
         if (data.data) setUser(data.data);
         setMessage(data.message || 'Profile updated');
         setLoading(false);
@@ -146,7 +139,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // on mount, try to restore user from token
   useEffect(() => {
     const tryRestore = async () => {
       const accessToken = localStorage.getItem('accessToken');
@@ -161,12 +153,10 @@ export const AuthProvider = ({ children }) => {
         if (res.ok && data && data.data) {
           setUser(data.data);
         } else {
-          // token might be invalid/expired -> clear stored tokens
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
         }
       } catch (err) {
-        // network error or other - clear tokens to avoid stale state
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
       }
