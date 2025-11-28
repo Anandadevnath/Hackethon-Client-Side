@@ -147,31 +147,31 @@ export default function HowItWorks() {
           className="mt-20 bg-white rounded-3xl p-10 shadow-[0_20px_45px_rgba(0,80,40,0.10)] max-w-[900px] mx-auto text-center"
         >
           <h3 className="text-[20px] font-extrabold text-[#105f37] mb-6">
-            How It Works
+            {isBn ? 'কীভাবে কাজ করে' : 'How It Works'}
           </h3>
 
           <div className="flex justify-center items-center gap-6 text-[15px] font-semibold text-white">
 
             <div className="bg-[#0fa451] px-5 py-2 rounded-full shadow">
-              Data
+              {isBn ? 'ডেটা' : 'Data'}
             </div>
 
             <div className="text-[#0fa451] text-2xl">→</div>
 
             <div className="bg-[#0fa451] px-5 py-2 rounded-full shadow">
-              Warning
+              {isBn ? 'সতর্কতা' : 'Warning'}
             </div>
 
             <div className="text-[#0fa451] text-2xl">→</div>
 
             <div className="bg-[#0fa451] px-5 py-2 rounded-full shadow">
-              Action
+              {isBn ? 'কর্ম' : 'Action'}
             </div>
 
             <div className="text-[#0fa451] text-2xl">→</div>
 
             <div className="bg-[#0fa451] px-5 py-2 rounded-full shadow">
-              Saved Food
+              {isBn ? 'সংরক্ষিত খাদ্য' : 'Saved Food'}
             </div>
 
           </div>

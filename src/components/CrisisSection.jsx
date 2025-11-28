@@ -80,18 +80,37 @@ export default function CrisisSection() {
           </p>
 
           <ul className="text-[#6b3b2b] space-y-3 leading-relaxed text-[15px]">
-            <li className="flex gap-2">
-              <span className="text-red-500 text-xl">•</span>
-              ফসল সংগ্রহের পরবর্তী ক্ষতি ধান, গম এবং সবজি‌তে সবচেয়ে বেশি প্রভাব ফেলে
-            </li>
-            <li className="flex gap-2">
-              <span className="text-red-500 text-xl">•</span>
-              অপর্যাপ্ত সংরক্ষণ সুবিধা এবং দুর্বল অবকাঠামো প্রধান কারণ
-            </li>
-            <li className="flex gap-2">
-              <span className="text-red-500 text-xl">•</span>
-              জলবায়ু পরিবর্তন ও অনিশ্চিত আবহাওয়া পরিস্থিতি আরও বাড়ায়
-            </li>
+            {isBn ? (
+              <>
+                <li className="flex gap-2">
+                  <span className="text-red-500 text-xl">•</span>
+                  ফসল সংগ্রহের পরবর্তী ক্ষতি ধান, গম এবং সবজি‌তে সবচেয়ে বেশি প্রভাব ফেলে
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-red-500 text-xl">•</span>
+                  অপর্যাপ্ত সংরক্ষণ সুবিধা এবং দুর্বল অবকাঠামো প্রধান কারণ
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-red-500 text-xl">•</span>
+                  জলবায়ু পরিবর্তন ও অনিশ্চিত আবহাওয়া পরিস্থিতি আরও বাড়ায়
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="flex gap-2">
+                  <span className="text-red-500 text-xl">•</span>
+                  Post-harvest losses most heavily affect rice, wheat and vegetables
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-red-500 text-xl">•</span>
+                  Inadequate storage facilities and weak infrastructure are primary causes
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-red-500 text-xl">•</span>
+                  Climate change and unpredictable weather conditions further increase losses
+                </li>
+              </>
+            )}
           </ul>
         </motion.div>
 
@@ -227,8 +246,11 @@ export default function CrisisSection() {
                    text-center p-6 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.06)]"
       >
         <p className="text-[#7a3b3b] leading-relaxed text-[15px]">
-          These losses affect farmers, families, and our environment—
-          contributing to food insecurity and economic waste across the nation.
+          {isBn ? (
+            'এই ক্ষতিগুলো কৃষক, পরিবার এবং আমাদের পরিবেশকে প্রভাবিত করে — জাতীয়ভাবে খাদ্য নিরাপত্তা ও অর্থনৈতিক অপচয়ে অবদান রাখে।'
+          ) : (
+            'These losses affect farmers, families, and our environment— contributing to food insecurity and economic waste across the nation.'
+          )}
         </p>
       </motion.div>
 
