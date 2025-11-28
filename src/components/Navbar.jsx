@@ -10,6 +10,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { lang, setLang } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const wrapperRef = useRef(null);
 
@@ -40,15 +41,15 @@ const Navbar = () => {
 
   return (
     <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-60 box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159,240,177,0.138)_0%,rgba(154,255,126,0.114)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
-      <div className="max-w-[1400px] mx-auto px-7 -py-4 flex items-center justify-between min-h-[72px]">
+      <div className="max-w-[1400px] mx-auto px-7 py-0 flex items-center justify-between min-h-[72px]">
           <div className="flex items-center">
             <div className="flex items-center">
               <Link to="/" className="inline-block">
-                <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-[90px] block" />
+                <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-14 md:h-[90px] block" />
               </Link>
             </div>
           </div>
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
             <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
             <span className="text-[#fffbe6] font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
@@ -79,6 +80,39 @@ const Navbar = () => {
             </div>
           ) : (
             <Link to="/login" className="bg-gradient-to-r from-[#9ef96a] to-[#49c74f] text-[#05310d] rounded-[28px] px-4 py-2 font-bold no-underline shadow-[0_10px_30px_rgba(46,125,50,0.18),0_0_0_6px_rgba(73,199,79,0.06)] transition-transform duration-150 hover:-translate-y-1">{lang === 'en' ? 'Join the Movement' : 'যোগ দিন'}</Link>
+          )}
+        </div>
+
+        {/* Mobile hamburger */}
+        <div className="flex items-center md:hidden">
+          <button onClick={() => setMobileOpen(v => !v)} aria-label="Toggle menu" className="p-2 rounded-md bg-white/6 backdrop-blur-sm">
+            {mobileOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu panel */}
+      <div className={`md:hidden px-6 pb-4 transition-max-h duration-300 overflow-hidden ${mobileOpen ? 'max-h-[400px] ease-out' : 'max-h-0'}`}>
+        <div className="flex flex-col gap-3 pt-3">
+          <button onClick={() => { setLang(l => l === 'en' ? 'bn' : 'en'); setMobileOpen(false); }} className="flex items-center gap-2 text-sm text-[#fffbe6]">
+            <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
+            <span className="font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
+          </button>
+
+          <a href="#about" onClick={() => setMobileOpen(false)} className="text-[#fffbe6] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</a>
+
+          {user ? (
+            <>
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block bg-white/90 text-[#0b6b3a] px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.06)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
+              <Link to="/profile" onClick={() => setMobileOpen(false)} className="block text-[#fffbe6] px-2 py-2">{lang === 'en' ? 'Profile' : 'প্রোফাইল'}</Link>
+              <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="text-left px-2 py-2 text-[#fffbe6]">{lang === 'en' ? 'Logout' : 'লগআউট'}</button>
+            </>
+          ) : (
+            <Link to="/login" onClick={() => setMobileOpen(false)} className="block bg-gradient-to-r from-[#9ef96a] to-[#49c74f] text-[#05310d] rounded-[28px] px-4 py-2 font-bold no-underline shadow-[0_10px_30px_rgba(46,125,50,0.18),0_0_0_6px_rgba(73,199,79,0.06)] transition-transform duration-150 hover:-translate-y-1">{lang === 'en' ? 'Join the Movement' : 'যোগ দিন'}</Link>
           )}
         </div>
       </div>

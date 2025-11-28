@@ -9,13 +9,13 @@ export default function HeroBanner() {
   const isBn = lang === 'bn';
 
   return (
-    <section className="relative min-h-[98vh] flex items-center text-white overflow-hidden">
+    <section className="relative min-h-[70vh] sm:min-h-[85vh] md:min-h-[98vh] flex items-center text-white overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center saturate-[0.95] brightness-[0.7] z-0"
         style={{ backgroundImage: bgImage }}
       />
 
-      <div className="relative z-10 w-full max-w-[1360px] mx-auto grid gap-9 px-7 py-24 items-center md:[grid-template-columns:1fr_420px]">
+      <div className="relative z-10 w-full max-w-[1360px] mx-auto grid gap-9 px-7 py-24 items-center md:grid-cols-2">
         <div className="text-white">
           <div className="">
             <div className="w-18 h-18 bg-white/95 text-[#26723a] rounded-lg flex items-center justify-center text-2xl shadow-[0_12px_40px_rgba(0,0,0,0.35)]">🌾</div>
@@ -57,7 +57,7 @@ export default function HeroBanner() {
         </div>
 
         <div className="flex justify-end items-center md:justify-end sm:justify-start">
-          <div className="w-[320px] bg-gradient-to-b from-white/6 to-white/3 rounded-[14px] p-5 text-white backdrop-blur-lg border border-white/8 shadow-[0_12px_36px_rgba(6,20,10,0.35)]">
+          <div className="w-full max-w-[320px] md:max-w-[420px] mx-auto md:mx-0 bg-gradient-to-b from-white/6 to-white/3 rounded-[14px] p-5 text-white backdrop-blur-lg border border-white/8 shadow-[0_12px_36px_rgba(6,20,10,0.35)]">
             <div className="inline-block bg-black/12 text-white/90 font-bold px-3 py-1 rounded-full text-sm mb-3">{isBn ? 'আমাদের মিশন' : 'Our Mission'}</div>
               <h3 className="text-sm font-bold leading-tight mb-2 text-[#eaf8e9]">{isBn ? 'উৎপাদনশীলতা, টেকসইতা এবং দক্ষতা বৃদ্ধিতে কৃষকদের উদ্ভাবনী সরঞ্জাম ও প্রযুক্তি দিয়ে সক্ষম করা।' : 'To empower farmers with innovative tools and technology that enhance productivity, sustainability, and efficiency.'}</h3>
               <p className="text-sm text-[rgba(234,248,233,0.9)] mb-3">{isBn ? 'কিভাবে আমরা ডেটা ও সরঞ্জাম ব্যবহার করে কৃষির ভবিষ্যত গড়ছি তা জানুন।' : 'Learn how we use data and tools to shape the future of farming.'}</p>
