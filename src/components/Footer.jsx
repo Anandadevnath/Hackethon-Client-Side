@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import logo from "../assets/Gemini_Generated_Image_ld4a7tld4a7tld4a-removebg-preview.png";
+import logoEn from "../assets/harvest-en-removebg-preview.png";
+import logoBn from "../assets/harvest-bn-removebg-preview.png";
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Footer() {
@@ -21,12 +22,12 @@ export default function Footer() {
         <div className="flex-1 min-w-[300px]">
 
           {/* Large Logo */}
-          {/* <motion.img
+          <motion.img
             whileHover={{ scale: 1.04 }}
-            src={logo}
+            src={isBn ? logoBn : logoEn}
             alt="HarvestGuard"
             className="w-40 h-40 object-contain mb-0 drop-shadow-lg"
-          /> */}
+          />
 
           {/* Description */}
           <p className="text-lg leading-relaxed max-w-[360px] mb-6">
