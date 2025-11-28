@@ -16,14 +16,15 @@
   right: 0;
   background: linear-gradient(90deg, rgba(159, 240, 177, 0.138) 0%, rgba(154, 255, 126, 0.114) 100%);
   box-shadow: 0 6px 20px rgba(6, 40, 20, 0.12);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  /* remove hairline so scrolled navbar blends with banner */
+  border-bottom: none;
   backdrop-filter: blur(11px) saturate(120%);
   -webkit-backdrop-filter: blur(11px) saturate(120%);
 }
 
 /* inner centered container that constrains navbar content */
 .navbar-inner {
-  max-width: 1500px;
+  max-width: 1450px;
   margin: 0 auto;
   padding: 0 30px;
   display: flex;
@@ -37,8 +38,9 @@
   align-items: center;
 }
 
+/* logo size */
 .navbar-wordmark img {
-  height: 44px;
+  height: 77px;
   display: block;
 }
 
@@ -63,16 +65,6 @@
 .navbar-wordmark {
   display: flex;
   align-items: center;
-}
-
-.navbar-lang {
-  background: rgba(255, 255, 255, 0.06);
-  color: #fffbe6;
-  border-radius: 10px;
-  padding: 0.35rem 0.7rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
 }
 
 .navbar-link {
