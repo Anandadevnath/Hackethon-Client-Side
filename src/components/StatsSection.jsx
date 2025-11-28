@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function StatsSection(){
   return (
-    <section className="bg-[linear-gradient(180deg,#0f4b2f_0%,#0b3f28_100%)] text-[#f7f7ee] py-8 px-4 shadow-[inset_0_8px_40px_rgba(0,0,0,0.15)]">
+    <section className="bg-[linear-gradient(180deg,#eafff1_0%,#5eff96_100%)] text-[#064e3b] py-8 px-4 shadow-[inset_0_8px_40px_rgba(0,0,0,0.04)]">
       <div className="max-w-[1180px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 items-center text-center py-6 px-3">
         <div>
           <div className="text-3xl md:text-4xl font-bold mb-1">4.5M</div>
