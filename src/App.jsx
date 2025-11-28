@@ -7,6 +7,7 @@ import StatsSection from "./components/StatsSection";
 import CrisisSection from "./components/CrisisSection";
 import HowItWorks from "./components/HowItWorks";
 import CallToAction from "./components/CallToAction";
+import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -32,6 +33,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/warnings" element={<Warnings />} />
           <Route path="/scan-crop" element={<ScanCrop />} />
+          <Route path="/about" element={<About />} />
           {/* Add other routes here */}
           <Route
             path="/"

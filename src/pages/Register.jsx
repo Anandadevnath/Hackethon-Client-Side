@@ -150,7 +150,7 @@ const Register = () => {
         <div className="mt-4 text-[#075c3c]">Already have an account? <a href="/login" className="underline text-[#075c3c]">Login Here</a></div>
 
         <button className="w-full mt-4 bg-[#fffbe6] text-[#075c3c] border-2 border-[#7be6b2] px-4 py-3 rounded-[12px]">🚜 Continue with Demo</button>
-        <div className="mt-4 p-3 rounded text-white bg-white/5 w-full text-center">📞 Need help signing up? Call our farmer support hotline: 16123 (24/7)</div>
+        <div className="mt-4 p-3 rounded text-black bg-white/5 w-full text-center">📞 Need help signing up? Call our farmer support hotline: 16123 (24/7)</div>
         {message && <div className="text-[#009e5c] font-bold mt-3">{message}</div>}
         {authMessage && <div className="text-[#009e5c] font-bold mt-3">{authMessage}</div>}
       </div>

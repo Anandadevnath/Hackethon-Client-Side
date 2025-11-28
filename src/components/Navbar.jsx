@@ -40,7 +40,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-60 box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159,240,177,0.138)_0%,rgba(154,255,126,0.114)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
+    <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-60 box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159, 240, 177, 0.61)_0%,rgba(154, 255, 126, 0.34)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
       <div className="max-w-[1400px] mx-auto px-4 py-0 flex items-center justify-between min-h-[72px]">
           <div className="flex items-center">
             <div className="flex items-center">
@@ -52,10 +52,10 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-4">
           <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
             <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
-            <span className="text-[#fffbe6] font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
+            <span className="text-[#67e794] font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
           </button>
 
-          <a href="#about" className="text-[#fffbe6] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</a>
+          <Link to="/about" className="text-[#73ffa4] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
 
           {user ? (
             <Link to="/dashboard" className="bg-white/90 text-[#0b6b3a] px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.06)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
@@ -103,7 +103,7 @@ const Navbar = () => {
             <span className="font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
           </button>
 
-          <a href="#about" onClick={() => setMobileOpen(false)} className="text-[#fffbe6] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</a>
+          <Link to="/about" onClick={() => setMobileOpen(false)} className="text-[#fffbe6] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
 
           {user ? (
             <>
