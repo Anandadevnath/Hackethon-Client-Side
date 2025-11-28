@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 
 const ForgotPassword = () => {
@@ -7,6 +7,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,6 +26,8 @@ const ForgotPassword = () => {
         const msg = data.message || "If that email exists, a reset link has been sent.";
         setMessage(msg);
         toast.success(msg);
+        // navigate to verify page so user can enter OTP
+        navigate('/verify', { state: { email } });
       } else {
         const errMsg = data.message || "Unable to process request.";
         setError(errMsg);
