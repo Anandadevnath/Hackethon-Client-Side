@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLanguage } from '../context/LanguageContext';
 import {
   ComposableMap,
   Geographies,
@@ -29,6 +30,8 @@ const fadeUp = {
 };
 
 export default function CrisisSection() {
+  const { lang } = useLanguage();
+  const isBn = lang === 'bn';
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [geoData, setGeoData] = useState(null);
 
@@ -69,12 +72,11 @@ export default function CrisisSection() {
           </motion.div>
 
           <h2 className="text-3xl mt-5 mb-4 text-[#7d1414] font-extrabold">
-            The Crisis We Face
+            {isBn ? 'আমরা যে সংকটটির সম্মুখীন' : 'The Crisis We Face'}
           </h2>
 
           <p className="text-[#8c2a2a] max-w-[520px] mb-5 leading-relaxed">
-            Bangladesh loses billions in food every year. This isn't just
-            numbers—it's real hunger, wasted resources, and broken dreams.
+            {isBn ? 'বাংলাদেশ প্রতিবছর খাদ্যভাণ্ডার থেকে কোটি কোটি টাকা হারায়। এটি কেবল সংখ্যা নয়—এটি বাস্তব ক্ষুধা, নষ্ট হওয়া সম্পদ, এবং ভাঙা স্বপ্ন।' : 'Bangladesh loses billions in food every year. This isn\'t just numbers—it\'s real hunger, wasted resources, and broken dreams.'}
           </p>
 
           <ul className="text-[#6b3b2b] space-y-3 leading-relaxed text-[15px]">
@@ -101,10 +103,10 @@ export default function CrisisSection() {
           className="bg-white rounded-2xl p-6 shadow-[0_28px_60px_rgba(12,40,20,0.08)]"
         >
           <h3 className="text-[#b32929] font-bold mb-1 text-lg">
-            Food Loss Risk Map
+            {isBn ? 'খাদ্য ক্ষতির ঝুঁকির মানচিত্র' : 'Food Loss Risk Map'}
           </h3>
           <p className="text-sm text-gray-500 mb-5">
-            Click a district to view crisis data
+            {isBn ? 'জেলা নির্বাচন করে সংকট তথ্য দেখুন' : 'Click a district to view crisis data'}
           </p>
 
           <div className="bg-[#e8f3ff] rounded-xl p-4 h-[340px] flex items-center justify-center">
@@ -164,13 +166,13 @@ export default function CrisisSection() {
             className="flex gap-3 mt-5 justify-center"
           >
             <span className="px-4 py-1 rounded-full bg-[#ffe1e1] text-[#d43b3b] text-sm shadow">
-              High Risk
+              {isBn ? 'উচ্চ ঝুঁকি' : 'High Risk'}
             </span>
             <span className="px-4 py-1 rounded-full bg-[#ffe9d4] text-[#f08d2e] text-sm shadow">
-              Medium Risk
+              {isBn ? 'মধ্যম ঝুঁকি' : 'Medium Risk'}
             </span>
             <span className="px-4 py-1 rounded-full bg-[#ddf6e7] text-[#2ea85f] text-sm shadow">
-              Low Risk
+              {isBn ? 'নিম্ন ঝুঁকি' : 'Low Risk'}
             </span>
           </motion.div>
 
@@ -189,9 +191,9 @@ export default function CrisisSection() {
       {/* BOTTOM CARDS */}
       <div className="max-w-[1220px] mx-auto mt-14 grid md:grid-cols-3 gap-7 px-3">
         {[
-          { icon: "📉", number: "0.0M", label: "Metric Tonnes Lost Annually" },
-          { icon: "💲", number: "$0.0B", label: "Economic Loss Per Year" },
-          { icon: "⚠️", number: "0M+", label: "People Facing Food Insecurity" },
+          { icon: "📉", number: "0.0M", label: isBn ? 'বার্ষিক হারানো টন' : 'Metric Tonnes Lost Annually' },
+          { icon: "💲", number: "$0.0B", label: isBn ? 'বার্ষিক অর্থনৈতিক ক্ষতি' : 'Economic Loss Per Year' },
+          { icon: "⚠️", number: "0M+", label: isBn ? 'খাদ্য অনিরাপত্তার মুখে থাকা মানুষ' : 'People Facing Food Insecurity' },
         ].map((card, i) => (
           <motion.div
             key={i}

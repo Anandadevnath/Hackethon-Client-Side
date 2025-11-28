@@ -1,7 +1,10 @@
 import React from "react";
+import { useLanguage } from '../context/LanguageContext';
 import { motion } from "framer-motion";
 
 export default function FeaturesSection() {
+  const { lang } = useLanguage();
+  const isBn = lang === 'bn';
   const cardVariants = {
     initial: { opacity: 0, y: 40 },
     animate: { opacity: 1, y: 0 },
@@ -33,11 +36,11 @@ export default function FeaturesSection() {
           </div>
 
           <h3 className="text-xl font-bold text-green-900 drop-shadow-sm">
-            Modern Agriculture Equipment
+            {isBn ? 'আধুনিক কৃষি যন্ত্রপাতি' : 'Modern Agriculture Equipment'}
           </h3>
 
           <p className="text-green-900/80 mt-3 leading-6">
-            Advanced storage and monitoring solutions designed to preserve crop quality using smart automation.
+            {isBn ? 'ফসলের গুণমান সংরক্ষণের জন্য উন্নত সংরক্ষণ ও মনিটরিং সলিউশন, স্মার্ট অটোমেশন ব্যবহার করে।' : 'Advanced storage and monitoring solutions designed to preserve crop quality using smart automation.'}
           </p>
         </motion.div>
 
@@ -55,11 +58,11 @@ export default function FeaturesSection() {
           </div>
 
           <h3 className="text-xl font-bold text-green-900">
-            Organic & Fresh Harvest
+            {isBn ? 'জৈব ও তাজা ফসল' : 'Organic & Fresh Harvest'}
           </h3>
 
           <p className="text-green-900/80 mt-3 leading-6">
-            Real-time crop insights ensure only the freshest, most nutrient-rich harvest reaches the market.
+            {isBn ? 'রিয়েল-টাইম ফসল সূচক নিশ্চিত করে যে সর্বাধিক তাজা ও পুষ্টিগুণসম্পন্ন ফলাফল বাজারে পৌঁছায়।' : 'Real-time crop insights ensure only the freshest, most nutrient-rich harvest reaches the market.'}
           </p>
         </motion.div>
 
@@ -77,11 +80,11 @@ export default function FeaturesSection() {
           </div>
 
           <h3 className="text-xl font-bold text-green-900">
-            Professional & Expert Farmers
+            {isBn ? 'পেশাদার ও অভিজ্ঞ কৃষক' : 'Professional & Expert Farmers'}
           </h3>
 
           <p className="text-green-900/80 mt-3 leading-6">
-            Collaborate with experienced farming professionals who use data-driven techniques for success.
+            {isBn ? 'অভিজ্ঞ কৃষি পেশাজীবীদের সঙ্গে সহযোগিতা করুন যারা ডেটা-চালিত কৌশল ব্যবহার করে সফলতা অর্জন করেন।' : 'Collaborate with experienced farming professionals who use data-driven techniques for success.'}
           </p>
         </motion.div>
 

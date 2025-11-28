@@ -1,7 +1,10 @@
 import React from "react";
+import { useLanguage } from '../context/LanguageContext';
 import { motion } from "framer-motion";
 
 export default function CallToAction() {
+  const { lang } = useLanguage();
+  const isBn = lang === 'bn';
   return (
     <section className="relative overflow-hidden text-white 
         bg-[linear-gradient(180deg,#0aa460_0%,#0a8f58_60%,#067e4b_100%)] py-24 px-4">
@@ -16,7 +19,7 @@ export default function CallToAction() {
           transition={{ duration: 0.6 }}
           className="text-3xl md:text-5xl font-extrabold mb-3 drop-shadow-lg"
         >
-          Be Part of the Solution
+          {isBn ? 'সমাধানের অংশ হন' : 'Be Part of the Solution'}
         </motion.h2>
 
         <motion.p
@@ -26,7 +29,7 @@ export default function CallToAction() {
           transition={{ duration: 0.8 }}
           className="text-white/90 text-lg mb-8"
         >
-          Join farmers, distributors, and communities across Bangladesh in fighting food loss
+          {isBn ? 'খাদ্য ক্ষতির বিরুদ্ধে লড়াইয়ে বাংলাদেশজুড়ে কৃষক, পরিবেশক ও সম্প্রদায়গুলোর সঙ্গে যোগ দিন' : 'Join farmers, distributors, and communities across Bangladesh in fighting food loss'}
         </motion.p>
 
         {/* BUTTONS */}
@@ -44,7 +47,7 @@ export default function CallToAction() {
             className="rounded-[28px] px-7 py-3 font-bold bg-white text-[#067e49] 
             shadow-[0_18px_40px_rgba(0,0,0,0.2)] inline-flex items-center"
           >
-            <span className="mr-2">✨</span> Get Started Now →
+            <span className="mr-2">✨</span> {isBn ? 'এখনই শুরু করুন →' : 'Get Started Now →'}
           </motion.button>
 
           {/* Button 2 */}
@@ -54,7 +57,7 @@ export default function CallToAction() {
             className="rounded-[28px] px-6 py-3 font-bold bg-transparent text-white 
             border border-white/40"
           >
-            Learn More
+            {isBn ? 'আরও জানুন' : 'Learn More'}
           </motion.button>
         </motion.div>
 
@@ -68,14 +71,14 @@ export default function CallToAction() {
         />
 
         {/* SUBTEXT */}
-        <motion.p
+          <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
           className="text-white/85 mb-6 text-sm tracking-wide"
         >
-          Together, we can achieve <strong>SDG 12.3</strong> and halve food loss by 2030
+          {isBn ? <>একসাথে আমরা <strong>SDG 12.3</strong> অর্জন করতে পারি এবং ২০৩০ সালের মধ্যে খাদ্য ক্ষতি অর্ধেকে নামাতে পারি</> : <>Together, we can achieve <strong>SDG 12.3</strong> and halve food loss by 2030</>}
         </motion.p>
 
         {/* SDG BADGE */}
@@ -96,7 +99,7 @@ export default function CallToAction() {
           </motion.div>
 
           <div className="text-left text-[14px] leading-tight">
-            <span className="opacity-80">Supporting</span>
+            <span className="opacity-80">{isBn ? 'সমর্থন করছে' : 'Supporting'}</span>
             <br />
             <strong className="text-white">SDG 12.3</strong>
           </div>

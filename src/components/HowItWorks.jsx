@@ -1,7 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useLanguage } from '../context/LanguageContext';
 
 export default function HowItWorks() {
+  const { lang } = useLanguage();
+  const isBn = lang === 'bn';
   const steps = [
     {
       id: 1,
@@ -58,10 +61,10 @@ export default function HowItWorks() {
           </div>
 
           <h2 className="text-4xl font-extrabold text-[#125f38] mt-4">
-            How HarvestGuard Works
+            {isBn ? 'HarvestGuard কীভাবে কাজ করে' : 'How HarvestGuard Works'}
           </h2>
           <p className="text-[#226343] opacity-80 mt-2 text-sm">
-            Four simple steps to save our harvest
+            {isBn ? 'আমাদের ফসল রক্ষার চারটি সহজ ধাপ' : 'Four simple steps to save our harvest'}
           </p>
         </motion.div>
 
@@ -74,10 +77,10 @@ export default function HowItWorks() {
           className="flex flex-wrap justify-center gap-4 mt-10"
         >
           {[
-            "✔️ 60% Reduction in Post-Harvest Losses",
-            "✔️ Real-Time Monitoring & Alerts",
-            "✔️ AI-Powered Crop Health Analysis",
-            "✔️ Increased Farmer Income by 40%",
+            isBn ? '✔️ ফসল সঞ্চয়ের ৬০% উল্লেখযোগ্য হ্রাস' : '✔️ 60% Reduction in Post-Harvest Losses',
+            isBn ? '✔️ রিয়েল-টাইম পর্যবেক্ষণ ও সতর্কতা' : '✔️ Real-Time Monitoring & Alerts',
+            isBn ? '✔️ এআই-চালিত ফসল স্বাস্থ্য বিশ্লেষণ' : '✔️ AI-Powered Crop Health Analysis',
+            isBn ? '✔️ কৃষকের আয় ৪০% বৃদ্ধি' : '✔️ Increased Farmer Income by 40%',
           ].map((b, i) => (
             <motion.div
               key={i}
@@ -119,9 +122,17 @@ export default function HowItWorks() {
               <div className="p-6">
                 <div className="text-3xl mb-2">{step.icon}</div>
                 <h3 className="font-bold text-[18px] text-[#0c3e25] mb-1">
-                  {step.title}
+                  {isBn ? (
+                    step.id === 1 ? 'ডেটা সংগ্রহ' : step.id === 2 ? 'স্মার্ট সতর্কতা' : step.id === 3 ? 'কার্যকর ব্যবস্থা' : 'খাদ্য সংরক্ষণ'
+                  ) : (
+                    step.title
+                  )}
                 </h3>
-                <p className="text-[#577a63] text-sm leading-6">{step.desc}</p>
+                <p className="text-[#577a63] text-sm leading-6">{isBn ? (
+                  step.id === 1 ? 'রিয়েল-টাইমে সংরক্ষণ অবস্থান, তাপমাত্রা ও আর্দ্রতা পর্যবেক্ষণ' : step.id === 2 ? 'যখন শর্ত ক্ষতির ঝুঁকি সৃষ্টি করে তখন তাৎক্ষণিক এলার্ট পান' : step.id === 3 ? 'ক্ষয় রোধে গাইড করা ধাপগুলি অনুসরণ করুন' : 'বর্জ্য কমান, আয় বাড়ান এবং আরও পরিবারকে খাদ্য সরবরাহ করুন'
+                ) : (
+                  step.desc
+                )}</p>
               </div>
             </motion.div>
           ))}

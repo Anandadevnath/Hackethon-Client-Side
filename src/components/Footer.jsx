@@ -1,8 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import logo from "../assets/Gemini_Generated_Image_ld4a7tld4a7tld4a-removebg-preview.png";
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Footer() {
+  const { lang } = useLanguage();
+  const isBn = lang === 'bn';
   return (
     <footer className="relative bg-[linear-gradient(180deg,#094f32_0%,#053d2b_100%)] text-[#e6ffe6] pt-12 pb-6 overflow-hidden">
 
@@ -27,8 +30,7 @@ export default function Footer() {
 
           {/* Description */}
           <p className="text-lg leading-relaxed max-w-[360px] mb-6">
-            Empowering Bangladeshi farmers with smart technology to reduce food waste,
-            protect harvests, and ensure food security for every family.
+            {isBn ? 'কৃষকেরাদের খাদ্য নষ্ট কমাতে, ফসল রক্ষা করতে এবং প্রতিটি পরিবারের খাদ্য সুরক্ষা নিশ্চিত করতে স্মার্ট প্রযুক্তি দিয়ে সক্ষম করা।' : 'Empowering Bangladeshi farmers with smart technology to reduce food waste, protect harvests, and ensure food security for every family.'}
           </p>
 
           {/* Contact Info */}
@@ -59,16 +61,16 @@ export default function Footer() {
 
           {[
             {
-              title: "Quick Links",
-              items: ["Home", "About", "Dashboard", "Login"],
+              title: isBn ? 'দ্রুত লিঙ্ক' : 'Quick Links',
+              items: isBn ? ["হোম", "আমাদের সম্পর্কে", "ড্যাশবোর্ড", "লগইন"] : ["Home", "About", "Dashboard", "Login"],
             },
             {
-              title: "Resources",
-              items: ["Training Videos", "Help Center", "FAQs", "Community Forum"],
+              title: isBn ? 'সম্পদ' : 'Resources',
+              items: isBn ? ["প্রশিক্ষণ ভিডিও", "সাহায্য কেন্দ্র", "প্রশ্নাবলি", "কমিউনিটি ফোরাম"] : ["Training Videos", "Help Center", "FAQs", "Community Forum"],
             },
             {
-              title: "Legal",
-              items: ["Privacy Policy", "Terms of Service", "Data Security"],
+              title: isBn ? 'আইনি' : 'Legal',
+              items: isBn ? ["গোপনীয়তা নীতি", "পরিষেবা শর্ত", "ডেটা নিরাপত্তা"] : ["Privacy Policy", "Terms of Service", "Data Security"],
             },
           ].map((section, idx) => (
             <motion.div
