@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const { login, message, setMessage } = useAuth();
@@ -12,7 +13,10 @@ const Login = () => {
     const result = await login(loginData);
     if (result.ok) {
       // redirect to dashboard
+      toast.success(result.data?.message || 'Logged in successfully');
       navigate('/dashboard');
+    } else {
+      toast.error(result?.data?.message || result?.error?.message || 'Login failed');
     }
   };
 

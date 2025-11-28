@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const API_BASE = "http://localhost:8000"; 
 
@@ -27,10 +28,12 @@ const Register = () => {
     setMessage("");
     if (registerData.password !== registerData.confirmPassword) {
       setMessage("Passwords do not match.");
+      toast.error("Passwords do not match.");
       return;
     }
     if (!registerData.agree) {
       setMessage("You must agree to the terms.");
+      toast.error("You must agree to the terms.");
       return;
     }
     const payload = { ...registerData };
@@ -50,7 +53,10 @@ const Register = () => {
     const result = await register(payload);
     if (result.ok) {
       // on success, navigate to login
+      toast.success(result.data?.message || 'Registered successfully');
       navigate('/login');
+    } else {
+      toast.error(result?.data?.message || result?.error?.message || 'Registration failed');
     }
   };
 

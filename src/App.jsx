@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Warnings from "./pages/Warnings";
 import ScanCrop from "./pages/ScanCrop";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Navbar />
+        <Toaster position="top-right" />
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -21,12 +22,18 @@ const ForgotPassword = () => {
 
       const data = await res.json();
       if (res.ok) {
-        setMessage(data.message || "If that email exists, a reset link has been sent.");
+        const msg = data.message || "If that email exists, a reset link has been sent.";
+        setMessage(msg);
+        toast.success(msg);
       } else {
-        setError(data.message || "Unable to process request.");
+        const errMsg = data.message || "Unable to process request.";
+        setError(errMsg);
+        toast.error(errMsg);
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      const errMsg = "Network error. Please try again.";
+      setError(errMsg);
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }
