@@ -17,6 +17,7 @@ const Dashboard = () => {
     notes: ''
   });
   const [errors, setErrors] = useState([]);
+  const [showCreate, setShowCreate] = useState(false);
 
   useEffect(() => {
     const fetchCrops = async () => {
@@ -101,51 +102,65 @@ const Dashboard = () => {
         <div className="quick-actions">
           <h3>Quick Actions</h3>
           <div className="actions-row">
-            <button className="action add">+ Add New Crop Batch</button>
+            <button
+              className={"action add" + (showCreate ? ' active' : '')}
+              onClick={() => setShowCreate(s => !s)}
+            >+ Add New Crop Batch</button>
             <button className="action warn">⚠️ View Warnings</button>
             <button className="action scan">📷 Scan Crop (AI)</button>
           </div>
         </div>
 
-        <div className="create-crop">
-          <h3>Create Crop Batch</h3>
-          <form className="crop-form" onSubmit={handleSubmit}>
-            <label>Crop Type</label>
-            <select name="cropType" value={form.cropType} onChange={handleChange} required>
-              <option value="Paddy">Paddy</option>
-              <option value="Rice">Rice</option>
-            </select>
+        {showCreate ? (
+          <div className="create-crop">
+            <h3>Create Crop Batch</h3>
+            <form className="crop-form" onSubmit={handleSubmit}>
+              <label>Crop Type</label>
+              <select name="cropType" value={form.cropType} onChange={handleChange} required>
+                <option value="Paddy">Paddy</option>
+                <option value="Rice">Rice</option>
+              </select>
 
-            <label>Estimated Weight (kg)</label>
-            <input name="estimatedWeightKg" type="number" value={form.estimatedWeightKg} onChange={handleChange} required />
+              <label>Estimated Weight (kg)</label>
+              <input name="estimatedWeightKg" type="number" value={form.estimatedWeightKg} onChange={handleChange} required />
 
-            <label>Harvest Date</label>
-            <input name="harvestDate" type="date" value={form.harvestDate} onChange={handleChange} required />
+              <label>Harvest Date</label>
+              <input name="harvestDate" type="date" value={form.harvestDate} onChange={handleChange} required />
 
-            <label>Storage Division</label>
-            <input name="division" value={form.storageLocation.division} onChange={handleChange} required />
+              <label>Storage Division</label>
+              <input name="division" value={form.storageLocation.division} onChange={handleChange} required />
 
-            <label>Storage District</label>
-            <input name="district" value={form.storageLocation.district} onChange={handleChange} required />
+              <label>Storage District</label>
+              <input name="district" value={form.storageLocation.district} onChange={handleChange} required />
 
-            <label>Storage Type</label>
-            <select name="storageType" value={form.storageType} onChange={handleChange} required>
-              <option value="Jute Bag Stack">Jute Bag Stack</option>
-              <option value="Silo">Silo</option>
-              <option value="Open Area">Open Area</option>
-            </select>
+              <label>Storage Type</label>
+              <select name="storageType" value={form.storageType} onChange={handleChange} required>
+                <option value="Jute Bag Stack">Jute Bag Stack</option>
+                <option value="Silo">Silo</option>
+                <option value="Open Area">Open Area</option>
+              </select>
 
-            <label>Notes</label>
-            <textarea name="notes" value={form.notes} onChange={handleChange} />
+              <label>Notes</label>
+              <textarea name="notes" value={form.notes} onChange={handleChange} />
 
-            <button className="auth-btn" type="submit" disabled={loading}>{loading ? 'Creating...' : 'Create Crop'}</button>
-            {errors && errors.length > 0 && (
-              <div className="form-errors">
-                {errors.map((err, i) => <div key={i} style={{color:'#c33b2f',marginTop:8}}>- {err}</div>)}
-              </div>
-            )}
-          </form>
-        </div>
+              <button className="auth-btn" type="submit" disabled={loading}>{loading ? 'Creating...' : 'Create Crop'}</button>
+              {errors && errors.length > 0 && (
+                <div className="form-errors">
+                  {errors.map((err, i) => <div key={i} style={{color:'#c33b2f',marginTop:8}}>- {err}</div>)}
+                </div>
+              )}
+            </form>
+          </div>
+        ) : (
+          <div className="weather-highlight">
+            <h3>Weather Highlight</h3>
+            <div className="weather-cards">
+              <div className="card">32°C<br/><small>Temperature</small></div>
+              <div className="card">75%<br/><small>Humidity</small></div>
+              <div className="card">85%<br/><small>Rainfall</small></div>
+            </div>
+          </div>
+        )}
 
         <div className="risk-alerts">
           <h3>Risk Alerts</h3>

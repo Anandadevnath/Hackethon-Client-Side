@@ -1,13 +1,35 @@
 .navbar {
-  width: 100vw;
-  min-height: 70px;
-  background: linear-gradient(90deg, #106b3c 0%, #005c3c 100%);
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  box-sizing: border-box;
+  background: transparent;
+  transition: all 220ms ease;
+}
+
+.navbar.scrolled {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, rgba(159, 240, 177, 0.138) 0%, rgba(154, 255, 126, 0.114) 100%);
+  box-shadow: 0 6px 20px rgba(6, 40, 20, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(11px) saturate(120%);
+  -webkit-backdrop-filter: blur(11px) saturate(120%);
+}
+
+/* inner centered container that constrains navbar content */
+.navbar-inner {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2.5rem;
-  box-sizing: border-box;
-  border-bottom: 4px solid #00e68a;
+  min-height: 72px;
 }
 
 .navbar-left {
@@ -15,79 +37,89 @@
   align-items: center;
 }
 
-.navbar-logo {
-  background: rgba(255,255,255,0.05);
-  border-radius: 1.5rem;
-  padding: 0.5rem 0.7rem;
-  display: flex;
-  align-items: center;
-  margin-right: 0.7rem;
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-.navbar-logo img {
-  width: 32px;
-  height: 32px;
+.navbar-wordmark img {
+  height: 44px;
+  display: block;
 }
 
 .navbar-title {
   color: #fffbe6;
-  font-size: 2rem;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+}
+
+.navbar-wordmark img {
+  height: 77px;
+  display: block;
+}
+
+.navbar-wordmark {
+  display: flex;
+  align-items: center;
 }
 
 .navbar-lang {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.06);
   color: #fffbe6;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 1rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 1.2rem;
+  border-radius: 10px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  margin-right: 0.5rem;
-  transition: background 0.2s;
-}
-
-.navbar-lang:hover {
-  background: rgba(255,255,255,0.18);
 }
 
 .navbar-link {
   color: #fffbe6;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
-  margin-right: 0.5rem;
-  transition: color 0.2s;
+  margin-right: 0.4rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 8px;
+  transition: background 0.12s, color 0.12s;
 }
 
 .navbar-link:hover {
-  color: #00e68a;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .navbar-cta {
-  background: linear-gradient(90deg, #fffbe6 0%, #fff6d6 100%);
-  color: #0a4d2c;
-  border: none;
-  border-radius: 1rem;
-  padding: 0.7rem 2rem;
-  font-size: 1.3rem;
+  background: linear-gradient(90deg, #9ef96a, #49c74f);
+  color: #05310d;
+  border: 0;
+  border-radius: 28px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: background 0.2s;
+  box-shadow: 0 10px 30px rgba(46, 125, 50, 0.18), 0 0 0 6px rgba(73, 199, 79, 0.06);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .navbar-cta:hover {
-  background: linear-gradient(90deg, #ffeeb0 0%, #fffbe6 100%);
+  transform: translateY(-3px);
+}
+
+/* explicit Dashboard button (logged in) */
+.navbar-dashboard {
+  background: rgba(255, 250, 230, 0.9);
+  color: #0b6b3a;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 14px rgba(6, 40, 20, 0.06);
+}
+
+.navbar-dashboard:hover {
+  transform: translateY(-2px);
 }
 
 /* profile area */
@@ -96,6 +128,7 @@
   display: flex;
   align-items: center;
 }
+
 .profile-trigger {
   display: flex;
   align-items: center;
@@ -103,44 +136,49 @@
   cursor: pointer;
   color: #fffbe6;
 }
+
 .profile-avatar {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.12);
+  border: 2px solid rgba(255, 255, 255, 0.12);
 }
+
 .profile-avatar.fallback {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.15);
   color: #fffbe6;
   font-weight: 700;
 }
+
 .profile-name {
   color: #fffbe6;
   font-weight: 600;
 }
+
 .profile-menu {
   position: absolute;
   right: 0;
-  top: calc(100% + 4px);
-  background: #ffffff;
+  top: calc(100% + 8px);
+  background: linear-gradient(180deg, #fff, #fbfff8);
   color: #0a4d2c;
-  border-radius: 8px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  min-width: 160px;
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(6, 40, 20, 0.12);
+  min-width: 180px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 40;
+  z-index: 60;
   pointer-events: none;
   visibility: hidden;
   opacity: 0;
   transform: translateY(6px);
-  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+  transition: opacity 140ms ease, transform 140ms ease, visibility 140ms;
 }
+
 .profile-menu-item {
   padding: 0.8rem 1rem;
   text-decoration: none;
@@ -150,8 +188,9 @@
   text-align: left;
   cursor: pointer;
 }
+
 .profile-menu-item:hover {
-  background: rgba(0,0,0,0.03);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 /* open state controlled by JS class to avoid hover fragility */

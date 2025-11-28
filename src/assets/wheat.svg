@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <title>Wheat</title>
+  <g stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M5 3c3 1 5 4 6.5 7C12.8 7 15 4 19 3" />
+    <path d="M5 7c3 1 5 4 6.5 7C12.8 11 15 8 19 7" />
+    <path d="M5 11c3 1 5 4 6.5 7C12.8 15 15 12 19 11" />
+    <path d="M12 2v20" />
+    <path d="M9 5l6 2" />
+    <path d="M9 9l6 2" />
+    <path d="M9 13l6 2" />
+  </g>
+</svg>
