@@ -17,7 +17,7 @@ export default function FeaturesSection() {
         <div className="absolute bottom-10 right-10 w-72 h-72 bg-emerald-300/40 rounded-full blur-[100px]"></div>
       </div>
 
-      <div className="max-w-[1180px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+      <div className="max-w-[1300px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
 
         {/* Highlight Card */}
         <motion.div
