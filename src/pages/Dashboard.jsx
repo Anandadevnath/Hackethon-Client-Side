@@ -8,10 +8,7 @@ import {
   Info,
   Plus,
   Eye,
-  MapPin,
-  Thermometer,
-  Droplet,
-  CloudRain,
+  
 } from "lucide-react";
 import { toast } from 'react-hot-toast';
 
@@ -35,7 +32,6 @@ export default function Dashboard() {
   const [crops, setCrops] = useState([]);
   const [loadingCrops, setLoadingCrops] = useState(true);
 
-  // Weather state (attempt to fetch, fallback provided)
   const [weather, setWeather] = useState({
     temp: "32°C",
     humidity: "75%",
@@ -43,8 +39,10 @@ export default function Dashboard() {
     location: "Dhaka",
     fetched: false,
   });
+  const [upazila, setUpazila] = useState(() => localStorage.getItem('selectedUpazila') || 'Dhaka');
+  const [forecast, setForecast] = useState([]); // 5-day forecast array
+  const [loadingWeather, setLoadingWeather] = useState(false);
 
-  // Alerts & tips (could be fetched from API in future)
   const [alerts, setAlerts] = useState([
     { id: 1, text: "High humidity detected - improve ventilation", level: "high" },
     { id: 2, text: "Rain forecasted in 2 days", level: "medium" },
@@ -72,7 +70,7 @@ export default function Dashboard() {
   // Load crops
   useEffect(() => {
     loadCrops();
-    loadWeather();
+    loadWeatherForUpazila(upazila);
   }, []);
 
   async function loadCrops() {
@@ -99,26 +97,103 @@ export default function Dashboard() {
     }
   }
 
-  async function loadWeather() {
+  // Convert latin digits to Bangla digits (optional helper)
+  function toBanglaDigits(input) {
+    const map = { '0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯' };
+    return String(input).split('').map(c => map[c] ?? c).join('');
+  }
+
+  // Geocode Upazila (Nominatim) -> {lat, lon, display_name}
+  async function geocodeUpazila(name) {
     try {
-      const lat = 23.8103;
-      const lon = 90.4125;
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia%2FDhaka`;
-      const res = await fetch(url);
-      const d = await res.json().catch(() => ({}));
-      if (res.ok && d.current_weather) {
-        setWeather((w) => ({
-          ...w,
-          temp: `${Math.round(d.current_weather.temperature)}°C`,
-          humidity: w.humidity,
-          rainfall: w.rainfall ?? "85%",
-          fetched: true,
-        }));
+      const q = encodeURIComponent(name + ', Bangladesh');
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'bn' } });
+      const arr = await res.json().catch(() => []);
+      if (Array.isArray(arr) && arr.length > 0) {
+        const r = arr[0];
+        return { lat: parseFloat(r.lat), lon: parseFloat(r.lon), display_name: r.display_name };
       }
     } catch (err) {
-      // ignore; keep fallback values
-      console.warn("Weather fetch failed, using fallback.");
+      console.warn('Geocode failed', err);
     }
+    return null;
+  }
+
+  // Fetch 5-day forecast from Open-Meteo for an Upazila name
+  async function loadWeatherForUpazila(name) {
+    if (!name) return;
+    setLoadingWeather(true);
+    try {
+      localStorage.setItem('selectedUpazila', name);
+      const geo = await geocodeUpazila(name);
+      const lat = geo?.lat ?? 23.8103;
+      const lon = geo?.lon ?? 90.4125;
+
+      // Request daily precipitation probability and temperature, plus hourly humidity
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=relativehumidity_2m&current_weather=true&timezone=Asia%2FDhaka`;
+      const res = await fetch(url);
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.daily) {
+        // Build a simple 5-day summary
+        const days = (d.daily.time || []).slice(0,5).map((t, i) => ({
+          date: t,
+          temp_max: d.daily.temperature_2m_max?.[i],
+          temp_min: d.daily.temperature_2m_min?.[i],
+          precip_prob: d.daily.precipitation_probability_max?.[i] ?? 0,
+        }));
+
+        // get current humidity from hourly series nearest to current time
+        let humidity = weather.humidity;
+        if (d.hourly && d.hourly.relativehumidity_2m && d.hourly.time) {
+          const nowIso = new Date().toISOString().slice(0,13); // YYYY-MM-DDTHH
+          // find first hourly index that starts with today's hour
+          const idx = d.hourly.time.findIndex(ts => ts.startsWith(nowIso));
+          if (idx >= 0) humidity = `${Math.round(d.hourly.relativehumidity_2m[idx])}%`;
+        }
+
+        setWeather((w) => ({
+          ...w,
+          temp: `${Math.round(d.current_weather?.temperature ?? days[0]?.temp_max ?? 0)}°C`,
+          humidity: humidity,
+          rainfall: `${days[0]?.precip_prob ?? 0}%`,
+          location: name,
+          fetched: true,
+        }));
+        setForecast(days);
+      }
+    } catch (err) {
+      console.error('Failed to fetch forecast', err);
+    } finally {
+      setLoadingWeather(false);
+    }
+  }
+
+  // Generate a short Bangla advisory based on forecast and crops
+  function generateBanglaAdvisory(forecastArr, cropList) {
+    if (!forecastArr || forecastArr.length === 0) return 'কোনো পূর্বাভাস পাওয়া যায়নি।';
+    // Check next 3 days rain probability
+    const next3 = forecastArr.slice(0,3);
+    const maxRain = Math.max(...next3.map(d => d.precip_prob || 0));
+    const maxTemp = Math.max(...next3.map(d => d.temp_max || -999));
+
+    const advices = [];
+    if (maxRain >= 70) {
+      // If any rice crops, recommend harvest or cover
+      const hasRice = (cropList || []).some(c => (c.cropType || c.type || '').toLowerCase().includes('rice') || (c.cropType || '').toLowerCase().includes('ধান'));
+      if (hasRice) {
+        advices.push(`আগামী ৩ দিন সম্ভবত বৃষ্টি ${toBanglaDigits(Math.round(maxRain))}% → আজই ধান কাটুন বা ঢেকে রাখুন`);
+      } else {
+        advices.push(`আগামী ৩ দিন বৃষ্টির সম্ভাবনা ${toBanglaDigits(Math.round(maxRain))}% → সংরক্ষণ ও ঢেকে রাখুন`);
+      }
+    }
+
+    if (maxTemp >= 36) {
+      advices.push(`তাপমাত্রা ${toBanglaDigits(Math.round(maxTemp))}°C পর্যন্ত উঠতে পারে → শীতল/ছায়া এবং সেচ রাখুন`);
+    }
+
+    if (advices.length === 0) return 'আবহাওয়া স্থিতিশীল দেখা যাচ্ছে — রোজ সকালে আবহাওয়া পরীক্ষা করুন।';
+    return advices.join(' । ');
   }
 
   // Handle form input
@@ -156,14 +231,10 @@ export default function Dashboard() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        // try to surface server errors
         const errs = data?.errors ?? (data?.message ? [data.message] : ["Failed to create"]);
         setErrors(errs);
-        // show toast errors when available
         try { errs.forEach(e => toast.error(String(e))); } catch (e) {}
       } else {
-        // push new item & reload
-        // sometimes API returns created in data or as object
         const created = data?.data ?? data;
         setCrops((prev) => [created, ...prev]);
         setShowCreate(false);
@@ -176,7 +247,6 @@ export default function Dashboard() {
           storageType: "Silo",
           notes: "",
         });
-        // show toast notification and fallback to setMessage if present
         try { toast.success('Crop created successfully.'); } catch (e) { /* ignore if toast not available */ }
         if (typeof setMessage === "function") setMessage("Crop created successfully.");
       }
@@ -190,15 +260,7 @@ export default function Dashboard() {
     }
   }
 
-  // Utility to render risk badge like screenshot
-  function RiskBadge({ level }) {
-    const lvl = (level || "low").toString().toLowerCase();
-    if (lvl === "high")
-      return <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 text-sm font-semibold">High</span>;
-    if (lvl === "medium")
-      return <span className="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-sm font-semibold">Medium</span>;
-    return <span className="px-3 py-1 rounded-full bg-green-50 text-green-800 text-sm font-semibold">Low</span>;
-  }
+  
 
   return (
     <div className="min-h-screen bg-[#F5FFF6] px-8 py-8 mt-20">
@@ -252,9 +314,7 @@ export default function Dashboard() {
 
       {/* Main grid: left big column and right side */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Weather + Crop list */}
         <div className="lg:col-span-2 flex flex-col gap-6">
-          {/* Weather Highlight */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
