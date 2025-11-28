@@ -1,0 +1,14 @@
+{
+  "Dhaka": { "risk": "High", "score": 85 },
+  "Gazipur": { "risk": "Medium", "score": 60 },
+  "Narayanganj": { "risk": "High", "score": 78 },
+  "Chattogram": { "risk": "Medium", "score": 55 },
+  "Cox's Bazar": { "risk": "High", "score": 92 },
+  "Cumilla": { "risk": "Low", "score": 30 },
+  "Sylhet": { "risk": "Medium", "score": 50 },
+  "Rajshahi": { "risk": "Low", "score": 25 },
+  "Khulna": { "risk": "Medium", "score": 45 },
+  "Barishal": { "risk": "Low", "score": 20 },
+  "Rangpur": { "risk": "Low", "score": 18 },
+  "Mymensingh": { "risk": "Medium", "score": 40 }
+}

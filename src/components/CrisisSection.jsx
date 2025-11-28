@@ -22,6 +22,12 @@ const crisisData = {
   Mymensingh: 55,
 };
 
+// GLOBAL FADE VARIANT
+const fadeUp = {
+  hidden: { opacity: 0, y: 25 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
 export default function CrisisSection() {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [geoData, setGeoData] = useState(null);
@@ -42,13 +48,19 @@ export default function CrisisSection() {
 
   return (
     <section className="bg-[linear-gradient(180deg,#fff6f4_0%,#ffefe5_100%)] py-16 px-4">
-      <div className="max-w-[1180px] mx-auto grid md:grid-cols-[1fr_450px] gap-12 items-start">
+
+      <div className="max-w-[1200px] mx-auto grid md:grid-cols-[1fr_450px] gap-12 items-start">
 
         {/* LEFT CONTENT */}
-        <div>
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+        >
           <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
             className="w-16 h-16 rounded-xl bg-[rgba(255,80,60,0.10)] 
             text-[#ff3b2e] flex items-center justify-center text-2xl 
             shadow-[0_15px_35px_rgba(255,100,80,0.12)]"
@@ -79,12 +91,13 @@ export default function CrisisSection() {
               জলবায়ু পরিবর্তন ও অনিশ্চিত আবহাওয়া পরিস্থিতি আরও বাড়ায়
             </li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* RIGHT MAP */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
           className="bg-white rounded-2xl p-6 shadow-[0_28px_60px_rgba(12,40,20,0.08)]"
         >
           <h3 className="text-[#b32929] font-bold mb-1 text-lg">
@@ -100,10 +113,7 @@ export default function CrisisSection() {
             ) : (
               <ComposableMap
                 projection="geoMercator"
-                projectionConfig={{
-                  scale: 3500,
-                  center: [90.5, 24],
-                }}
+                projectionConfig={{ scale: 3500, center: [90.5, 24] }}
                 width={400}
                 height={370}
               >
@@ -147,7 +157,12 @@ export default function CrisisSection() {
           </div>
 
           {/* LEGEND */}
-          <div className="flex gap-3 mt-5 justify-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex gap-3 mt-5 justify-center"
+          >
             <span className="px-4 py-1 rounded-full bg-[#ffe1e1] text-[#d43b3b] text-sm shadow">
               High Risk
             </span>
@@ -157,7 +172,7 @@ export default function CrisisSection() {
             <span className="px-4 py-1 rounded-full bg-[#ddf6e7] text-[#2ea85f] text-sm shadow">
               Low Risk
             </span>
-          </div>
+          </motion.div>
 
           {selectedDistrict && (
             <motion.p
@@ -172,7 +187,7 @@ export default function CrisisSection() {
       </div>
 
       {/* BOTTOM CARDS */}
-      <div className="max-w-[1180px] mx-auto mt-14 grid md:grid-cols-3 gap-7 px-3">
+      <div className="max-w-[1220px] mx-auto mt-14 grid md:grid-cols-3 gap-7 px-3">
         {[
           { icon: "📉", number: "0.0M", label: "Metric Tonnes Lost Annually" },
           { icon: "💲", number: "$0.0B", label: "Economic Loss Per Year" },
@@ -180,6 +195,10 @@ export default function CrisisSection() {
         ].map((card, i) => (
           <motion.div
             key={i}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
             whileHover={{ scale: 1.04 }}
             className="bg-white rounded-xl p-6 shadow-[0_18px_36px_rgba(31,37,46,0.06)] flex gap-4 items-center"
           >
@@ -195,6 +214,22 @@ export default function CrisisSection() {
           </motion.div>
         ))}
       </div>
+
+      {/* LOSS EFFECT TEXT (NEW) */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="max-w-[900px] mx-auto mt-14 bg-white/60 backdrop-blur-md 
+                   text-center p-6 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.06)]"
+      >
+        <p className="text-[#7a3b3b] leading-relaxed text-[15px]">
+          These losses affect farmers, families, and our environment—
+          contributing to food insecurity and economic waste across the nation.
+        </p>
+      </motion.div>
+
     </section>
   );
 }
