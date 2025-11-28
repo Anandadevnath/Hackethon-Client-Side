@@ -20,13 +20,14 @@ export default function FeaturesSection() {
         <div className="absolute bottom-10 right-10 w-72 h-72 bg-emerald-300/40 rounded-full blur-[100px]"></div>
       </div>
 
-      <div className="max-w-[1300px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+      <motion.div className="max-w-[1300px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={{ show: { transition: { staggerChildren: 0.12 } } }}>
 
         {/* Highlight Card */}
         <motion.div
           variants={cardVariants}
           initial="initial"
-          animate="animate"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.2 }}
           whileHover="hover"
           transition={{ type: "spring", stiffness: 120, damping: 14 }}
           className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-10 shadow-[0_0_50px_rgba(0,150,80,0.20)] hover:shadow-[0_0_60px_rgba(0,200,110,0.35)] text-center"
@@ -48,7 +49,8 @@ export default function FeaturesSection() {
         <motion.div
           variants={cardVariants}
           initial="initial"
-          animate="animate"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.2 }}
           whileHover="hover"
           transition={{ type: "spring", stiffness: 120, damping: 14 }}
           className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-10 shadow-[0_0_40px_rgba(0,130,60,0.15)] hover:shadow-[0_0_55px_rgba(0,160,70,0.30)] text-center"
@@ -70,7 +72,8 @@ export default function FeaturesSection() {
         <motion.div
           variants={cardVariants}
           initial="initial"
-          animate="animate"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.2 }}
           whileHover="hover"
           transition={{ type: "spring", stiffness: 120, damping: 14 }}
           className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-10 shadow-[0_0_40px_rgba(0,130,60,0.15)] hover:shadow-[0_0_55px_rgba(0,160,70,0.30)] text-center"
@@ -88,7 +91,7 @@ export default function FeaturesSection() {
           </p>
         </motion.div>
 
-      </div>
+      </motion.div>
     </section>
   );
 }

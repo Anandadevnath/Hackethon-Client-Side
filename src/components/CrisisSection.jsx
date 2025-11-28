@@ -58,7 +58,8 @@ export default function CrisisSection() {
         <motion.div
           variants={fadeUp}
           initial="hidden"
-          animate="show"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -118,7 +119,8 @@ export default function CrisisSection() {
         <motion.div
           variants={fadeUp}
           initial="hidden"
-          animate="show"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
           className="bg-white rounded-2xl p-6 shadow-[0_28px_60px_rgba(12,40,20,0.08)]"
         >
           <h3 className="text-[#b32929] font-bold mb-1 text-lg">
