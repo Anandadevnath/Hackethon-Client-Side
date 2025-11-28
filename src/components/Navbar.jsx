@@ -1,7 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
-import logoEn from "../assets/Gemini_Generated_Image_ld4a7tld4a7tld4a-removebg-preview.png";
-import logoBn from "../assets/Gemini_Generated_Image_ppkkebppkkebppkk-removebg-preview.png";
+import logoEn from "../assets/harvest-en.png";
+import logoBn from "../assets/harvest-bn.png";
+import reactIcon from "../assets/react.svg";
 import { useLanguage } from "../context/LanguageContext";
+import { MdOutlineLanguage } from "react-icons/md";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -48,7 +50,7 @@ const Navbar = () => {
           </div>
         <div className="flex items-center gap-4">
           <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
-            <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
+            <MdOutlineLanguage className="w-5 h-5 text-[#1ecfff]" aria-hidden />
             <span className="text-[#fffbe6] font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
           </button>
 
