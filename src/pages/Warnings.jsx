@@ -115,13 +115,13 @@ export default function Warnings() {
         minHeight: "100vh",
         width: "100vw",
         margin: 0,
-        padding: "0 8px",
+        padding: "96px 8px 32px",
         overflowX: "hidden",
         background:
           "linear-gradient(160deg, #bbf7d0 0%, #ecfeff 40%, #e0f2fe 100%)",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "flex-start",
         boxSizing: "border-box",
       }}
     >

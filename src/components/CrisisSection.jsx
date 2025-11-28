@@ -1,220 +1,110 @@
-import React, { useState, useEffect } from "react";
-import { useLanguage } from '../context/LanguageContext';
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-} from "react-simple-maps";
+import React from "react";
+import { useLanguage } from "../context/LanguageContext";
 import { motion } from "framer-motion";
 
-// Stable Bangladesh District GeoJSON API
-const GEO_API =
-  "https://raw.githubusercontent.com/ratulbasak/bangladesh-geojson/master/bd-districts.json";
-
-// Dummy crisis data
-const crisisData = {
-  Chattogram: 74,
-  Dhaka: 65,
-  Sylhet: 58,
-  Rajshahi: 42,
-  Khulna: 38,
-  Barisal: 49,
-  Rangpur: 31,
-  Mymensingh: 55,
-};
-
-// GLOBAL FADE VARIANT
+// Fade-Up Variant
 const fadeUp = {
   hidden: { opacity: 0, y: 25 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+// Float Animation
+const float = {
+  animate: {
+    y: [0, -10, 0],
+    transition: { duration: 2.5, repeat: Infinity, ease: "easeInOut" }
+  }
 };
 
 export default function CrisisSection() {
   const { lang } = useLanguage();
-  const isBn = lang === 'bn';
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
-  const [geoData, setGeoData] = useState(null);
-
-  // Fetch GeoJSON manually to bypass CORS
-  useEffect(() => {
-    async function loadMap() {
-      try {
-        const res = await fetch(GEO_API);
-        const json = await res.json();
-        setGeoData(json);
-      } catch (err) {
-        console.error("MAP LOAD ERROR:", err);
-      }
-    }
-    loadMap();
-  }, []);
+  const isBn = lang === "bn";
 
   return (
-    <section className="bg-[linear-gradient(180deg,#fff6f4_0%,#ffefe5_100%)] py-16 px-4">
+    <section
+      className="
+      bg-[radial-gradient(circle_at_top,#fff7f4,#ffe8df,#ffd7ca)]
+      py-20 px-5
+    "
+    >
+      <div className="max-w-[1200px] mx-auto grid md:grid-cols-1 gap-12 items-start">
 
-      <div className="max-w-[1200px] mx-auto grid md:grid-cols-[1fr_450px] gap-12 items-start">
-
-        {/* LEFT CONTENT */}
+        {/* LEFT / MAIN CONTENT */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
         >
+          {/* Floating Warning Icon */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-16 h-16 rounded-xl bg-[rgba(255,80,60,0.10)] 
-            text-[#ff3b2e] flex items-center justify-center text-2xl 
-            shadow-[0_15px_35px_rgba(255,100,80,0.12)]"
+            variants={float}
+            animate="animate"
+            className="
+              w-20 h-20 rounded-2xl
+              bg-[rgba(255,60,60,0.12)]
+              text-[#ff2e2e]
+              flex items-center justify-center
+              text-4xl
+              shadow-[0_20px_40px_rgba(255,80,60,0.15)]
+            "
           >
             ⚠️
           </motion.div>
 
-          <h2 className="text-3xl mt-5 mb-4 text-[#7d1414] font-extrabold">
-            {isBn ? 'আমরা যে সংকটটির সম্মুখীন' : 'The Crisis We Face'}
+          {/* Title */}
+          <h2 className="text-4xl mt-6 mb-4 text-[#6e0d0d] font-extrabold tracking-tight">
+            {isBn ? "আমরা যে সংকটে আছি" : "The Crisis We Face"}
           </h2>
 
-          <p className="text-[#8c2a2a] max-w-[520px] mb-5 leading-relaxed">
-            {isBn ? 'বাংলাদেশ প্রতিবছর খাদ্যভাণ্ডার থেকে কোটি কোটি টাকা হারায়। এটি কেবল সংখ্যা নয়—এটি বাস্তব ক্ষুধা, নষ্ট হওয়া সম্পদ, এবং ভাঙা স্বপ্ন।' : 'Bangladesh loses billions in food every year. This isn\'t just numbers—it\'s real hunger, wasted resources, and broken dreams.'}
+          {/* Description */}
+          <p className="text-[#7a2626] text-[17px] max-w-[550px] mb-6 leading-relaxed">
+            {isBn
+              ? "বাংলাদেশ প্রতিবছর খাদ্য ব্যবস্থায় কোটি কোটি টাকার ক্ষতির মুখে পড়ে। এটি শুধু পরিসংখ্যান নয়—এটি বাস্তব ক্ষুধা, নষ্ট হওয়া সম্পদ এবং দুঃখজনক সামাজিক প্রভাব।"
+              : "Bangladesh loses billions of taka in food every year. This is not just data—it is real hunger, wasted resources, and serious social impact."}
           </p>
 
-          <ul className="text-[#6b3b2b] space-y-3 leading-relaxed text-[15px]">
+          {/* Bullet Points */}
+          <ul className="text-[#5a3b2b] space-y-3 leading-relaxed text-[16px]">
             {isBn ? (
               <>
-                <li className="flex gap-2">
-                  <span className="text-red-500 text-xl">•</span>
-                  ফসল সংগ্রহের পরবর্তী ক্ষতি ধান, গম এবং সবজি‌তে সবচেয়ে বেশি প্রভাব ফেলে
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-red-500 text-xl">•</span>
-                  অপর্যাপ্ত সংরক্ষণ সুবিধা এবং দুর্বল অবকাঠামো প্রধান কারণ
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-red-500 text-xl">•</span>
-                  জলবায়ু পরিবর্তন ও অনিশ্চিত আবহাওয়া পরিস্থিতি আরও বাড়ায়
-                </li>
+                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> ফসল সংগ্রহের পরবর্তী ক্ষতি ধান, গম এবং সবজিতে বেশি</li>
+                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> অপর্যাপ্ত সংরক্ষণ সুবিধা ও দুর্বল অবকাঠামো প্রধান কারণ</li>
+                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> জলবায়ু পরিবর্তনের অস্থিরতা ক্ষতির হার আরও বাড়ায়</li>
               </>
             ) : (
               <>
-                <li className="flex gap-2">
-                  <span className="text-red-500 text-xl">•</span>
-                  Post-harvest losses most heavily affect rice, wheat and vegetables
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-red-500 text-xl">•</span>
-                  Inadequate storage facilities and weak infrastructure are primary causes
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-red-500 text-xl">•</span>
-                  Climate change and unpredictable weather conditions further increase losses
-                </li>
+                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> Post-harvest losses severely impact rice, wheat and vegetables</li>
+                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> Poor storage facilities and outdated infrastructure worsen loss</li>
+                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> Climate volatility increases the risk of spoilage</li>
               </>
             )}
           </ul>
         </motion.div>
-
-        {/* RIGHT MAP */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          className="bg-white rounded-2xl p-6 shadow-[0_28px_60px_rgba(12,40,20,0.08)]"
-        >
-          <h3 className="text-[#b32929] font-bold mb-1 text-lg">
-            {isBn ? 'খাদ্য ক্ষতির ঝুঁকির মানচিত্র' : 'Food Loss Risk Map'}
-          </h3>
-          <p className="text-sm text-gray-500 mb-5">
-            {isBn ? 'জেলা নির্বাচন করে সংকট তথ্য দেখুন' : 'Click a district to view crisis data'}
-          </p>
-
-          <div className="bg-[#e8f3ff] rounded-xl p-4 h-[340px] flex items-center justify-center">
-            {!geoData ? (
-              <p>Loading map...</p>
-            ) : (
-              <ComposableMap
-                projection="geoMercator"
-                projectionConfig={{ scale: 3500, center: [90.5, 24] }}
-                width={400}
-                height={370}
-              >
-                <Geographies geography={geoData}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      const district = geo.properties.NAME_2;
-                      const crisis = crisisData[district] ?? 20;
-
-                      const fillColor =
-                        crisis > 65
-                          ? "#ff4e4e"
-                          : crisis > 45
-                          ? "#ffb347"
-                          : "#6cd66c";
-
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          onClick={() => setSelectedDistrict(district)}
-                          style={{
-                            default: {
-                              fill: fillColor,
-                              outline: "none",
-                              transition: "all 0.25s ease-in-out",
-                            },
-                            hover: {
-                              fill: "#37a95a",
-                              cursor: "pointer",
-                              outline: "none",
-                            },
-                          }}
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-              </ComposableMap>
-            )}
-          </div>
-
-          {/* LEGEND */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex gap-3 mt-5 justify-center"
-          >
-            <span className="px-4 py-1 rounded-full bg-[#ffe1e1] text-[#d43b3b] text-sm shadow">
-              {isBn ? 'উচ্চ ঝুঁকি' : 'High Risk'}
-            </span>
-            <span className="px-4 py-1 rounded-full bg-[#ffe9d4] text-[#f08d2e] text-sm shadow">
-              {isBn ? 'মধ্যম ঝুঁকি' : 'Medium Risk'}
-            </span>
-            <span className="px-4 py-1 rounded-full bg-[#ddf6e7] text-[#2ea85f] text-sm shadow">
-              {isBn ? 'নিম্ন ঝুঁকি' : 'Low Risk'}
-            </span>
-          </motion.div>
-
-          {selectedDistrict && (
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center text-[#c82222] font-semibold mt-5"
-            >
-              {selectedDistrict}: {crisisData[selectedDistrict] || 20}% Crisis Level
-            </motion.p>
-          )}
-        </motion.div>
       </div>
 
-      {/* BOTTOM CARDS */}
-      <div className="max-w-[1220px] mx-auto mt-14 grid md:grid-cols-3 gap-7 px-3">
+      {/* BOTTOM STAT CARDS */}
+      <div className="max-w-[1220px] mx-auto mt-20 grid md:grid-cols-3 gap-7 px-3">
+
         {[
-          { icon: "📉", number: "0.0M", label: isBn ? 'বার্ষিক হারানো টন' : 'Metric Tonnes Lost Annually' },
-          { icon: "💲", number: "$0.0B", label: isBn ? 'বার্ষিক অর্থনৈতিক ক্ষতি' : 'Economic Loss Per Year' },
-          { icon: "⚠️", number: "0M+", label: isBn ? 'খাদ্য অনিরাপত্তার মুখে থাকা মানুষ' : 'People Facing Food Insecurity' },
+          {
+            icon: "📉",
+            number: isBn ? "৪.৫M" : "4.5M",
+            labelBn: "বার্ষিক হারানো টন",
+            labelEn: "Metric Tonnes Lost Annually"
+          },
+          {
+            icon: "💲",
+            number: isBn ? "$১.৫B" : "$1.5B",
+            labelBn: "বার্ষিক অর্থনৈতিক ক্ষতি",
+            labelEn: "Economic Loss Per Year"
+          },
+          {
+            icon: "⚠️",
+            number: isBn ? "৩৮M+" : "38M+",
+            labelBn: "খাদ্য অনিরাপত্তায় থাকা মানুষ",
+            labelEn: "People Facing Food Insecurity"
+          }
         ].map((card, i) => (
           <motion.div
             key={i}
@@ -222,40 +112,56 @@ export default function CrisisSection() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            whileHover={{ scale: 1.04 }}
-            className="bg-white rounded-xl p-6 shadow-[0_18px_36px_rgba(31,37,46,0.06)] flex gap-4 items-center"
+            whileHover={{ scale: 1.06, transition: { duration: 0.25 } }}
+            className="
+              bg-white rounded-2xl p-7
+              shadow-[0_20px_45px_rgba(0,0,0,0.06)]
+              flex gap-5 items-center
+              transition-all
+            "
           >
-            <div className="w-16 h-16 rounded-lg bg-gradient-to-b from-[#ff8a5b] to-[#ff5a3b] text-white flex items-center justify-center text-2xl">
+            {/* Icon */}
+            <div className="
+              w-20 h-20 rounded-xl
+              bg-gradient-to-b from-[#ff8a5b] to-[#ff4c2e]
+              flex items-center justify-center text-3xl text-white shadow-lg
+            ">
               {card.icon}
             </div>
+
+            {/* Text */}
             <div>
-              <div className="text-2xl font-bold text-[#2b343a]">
+              <div className="text-3xl font-extrabold text-[#2e3338]">
                 {card.number}
               </div>
-              <div className="text-sm text-[#7a8589]">{card.label}</div>
+              <div className="text-sm text-[#7a8589]">
+                {isBn ? card.labelBn : card.labelEn}
+              </div>
             </div>
           </motion.div>
         ))}
+
       </div>
 
-      {/* LOSS EFFECT TEXT (NEW) */}
+      {/* LOSS EFFECT TEXT */}
       <motion.div
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="max-w-[900px] mx-auto mt-14 bg-white/60 backdrop-blur-md 
-                   text-center p-6 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.06)]"
+        className="
+          max-w-[900px] mx-auto mt-16
+          bg-white/70 backdrop-blur-xl
+          text-center p-7 rounded-xl
+          shadow-[0_12px_35px_rgba(0,0,0,0.06)]
+        "
       >
-        <p className="text-[#7a3b3b] leading-relaxed text-[15px]">
-          {isBn ? (
-            'এই ক্ষতিগুলো কৃষক, পরিবার এবং আমাদের পরিবেশকে প্রভাবিত করে — জাতীয়ভাবে খাদ্য নিরাপত্তা ও অর্থনৈতিক অপচয়ে অবদান রাখে।'
-          ) : (
-            'These losses affect farmers, families, and our environment— contributing to food insecurity and economic waste across the nation.'
-          )}
+        <p className="text-[#7a2f2f] leading-relaxed text-[16px]">
+          {isBn
+            ? "এই ক্ষতিগুলো কৃষকের আয়, পরিবারিক জীবন এবং পরিবেশকে সরাসরি প্রভাবিত করে—ফলে জাতীয় খাদ্য নিরাপত্তা হুমকির মুখে পড়ে।"
+            : "These losses directly affect farmers’ income, household stability, and the environment—pushing national food security at risk."}
         </p>
       </motion.div>
-
     </section>
   );
 }

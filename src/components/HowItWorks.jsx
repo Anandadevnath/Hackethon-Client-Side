@@ -1,6 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from '../context/LanguageContext';
+import img1 from '../assets/1.png';
+import img2 from '../assets/2.jpg';
+import img3 from '../assets/3.png';
+import img4 from '../assets/4.jpg';
 
 export default function HowItWorks() {
   const { lang } = useLanguage();
@@ -10,28 +14,28 @@ export default function HowItWorks() {
       id: 1,
       title: "Data Collection",
       desc: "Monitor storage conditions, temperature, and humidity in real-time",
-      img: "https://images.unsplash.com/photo-1503342217505-b0a15d3b6a8f?q=80&w=1000&auto=format&fit=crop",
+      img: img4,
       icon: "📦",
     },
     {
       id: 2,
       title: "Smart Warnings",
       desc: "Get instant alerts when conditions threaten your stored grains",
-      img: "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1000&auto=format&fit=crop",
+      img: img3,
       icon: "🔔",
     },
     {
       id: 3,
       title: "Take Action",
       desc: "Follow guided steps to prevent spoilage and loss",
-      img: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=1000&auto=format&fit=crop",
+      img: img2,
       icon: "⚡",
     },
     {
       id: 4,
       title: "Save Food",
       desc: "Reduce waste, increase income, and feed more families",
-      img: "https://images.unsplash.com/photo-1506806732259-39c2d0268443?q=80&w=1000&auto=format&fit=crop",
+      img: img1,
       icon: "💚",
     },
   ];
