@@ -43,7 +43,9 @@ const Navbar = () => {
       <div className="max-w-[1400px] mx-auto px-7 -py-4 flex items-center justify-between min-h-[72px]">
           <div className="flex items-center">
             <div className="flex items-center">
-              <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-[90px] block" />
+              <Link to="/" className="inline-block">
+                <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-[90px] block" />
+              </Link>
             </div>
           </div>
         <div className="flex items-center gap-4">
