@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-const API_BASE = "http://localhost:8000"; 
+const API_BASE = "https://hackethon-server-side-1.onrender.com"; 
 
 const Register = () => {
   const [registerData, setRegisterData] = useState({

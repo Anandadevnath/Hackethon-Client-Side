@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     setMessage("");
     setError("");
     try {
-      const res = await fetch("http://localhost:8000/user/forgot-password", {
+      const res = await fetch("https://hackethon-server-side-1.onrender.com/user/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

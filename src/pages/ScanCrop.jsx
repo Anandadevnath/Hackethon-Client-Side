@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 // Backend server runs on port 3000 by default (see server.js)
-const API_URL = "http://localhost:8000";
+const API_URL = "https://hackethon-server-side-1.onrender.com";
 
 const STRINGS = {
   bn: {
