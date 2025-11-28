@@ -4,13 +4,13 @@ export default function HeroBanner() {
   const bgImage = "linear-gradient(180deg, rgba(2, 20, 12, 0.35), rgba(4, 10, 6, 0.55)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f')";
 
   return (
-    <section className="relative min-h-[96vh] flex items-center text-white overflow-hidden">
+    <section className="relative min-h-[98vh] flex items-center text-white overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center saturate-[0.95] brightness-[0.7] z-0"
         style={{ backgroundImage: bgImage }}
       />
 
-      <div className="relative z-10 w-full max-w-[1410px] mx-auto grid gap-9 px-7 py-24 items-center md:[grid-template-columns:1fr_420px]">
+      <div className="relative z-10 w-full max-w-[1360px] mx-auto grid gap-9 px-7 py-24 items-center md:[grid-template-columns:1fr_420px]">
         <div className="text-white">
           <div className="">
             <div className="w-18 h-18 bg-white/95 text-[#26723a] rounded-lg flex items-center justify-center text-2xl shadow-[0_12px_40px_rgba(0,0,0,0.35)]">🌾</div>
