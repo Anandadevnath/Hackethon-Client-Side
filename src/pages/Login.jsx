@@ -13,8 +13,8 @@ const Login = () => {
     e.preventDefault();
     const result = await login(loginData);
     if (result.ok) {
-      // redirect to dashboard or home
-      navigate('/');
+      // redirect to dashboard
+      navigate('/dashboard');
     }
   };
 

@@ -42,6 +42,10 @@ const Navbar = () => {
         <a href="#about" className="navbar-link">About Us</a>
 
         {user ? (
+          <Link to="/dashboard" className="navbar-dashboard">Dashboard</Link>
+        ) : null}
+
+        {user ? (
           <div className="navbar-profile" ref={wrapperRef}>
             <div className="profile-trigger" onClick={() => setMenuOpen(v => !v)} role="button" tabIndex={0}>
               {user.avatar ? (
@@ -52,6 +56,7 @@ const Navbar = () => {
               <span className="profile-name">{user.name || user.email || 'User'}</span>
             </div>
             <div className={"profile-menu" + (menuOpen ? ' open' : '')}>
+              <Link to="/dashboard" className="profile-menu-item" onClick={() => setMenuOpen(false)}>Dashboard</Link>
               <Link to="/profile" className="profile-menu-item" onClick={() => setMenuOpen(false)}>Profile</Link>
               <button className="profile-menu-item" onClick={handleLogout}>Logout</button>
             </div>

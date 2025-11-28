@@ -10,6 +10,7 @@ import CallToAction from './components/CallToAction';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Dashboard from './pages/Dashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
@@ -20,6 +21,7 @@ function App() {
 			<Router>
 				<Navbar />
 				<Routes>
+					<Route path="/dashboard" element={<Dashboard />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/profile" element={<Profile />} />
