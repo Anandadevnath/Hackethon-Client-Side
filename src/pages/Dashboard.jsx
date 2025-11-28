@@ -2,15 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import {
-  CloudSun,
-  AlertTriangle,
-  Info,
-  Plus,
-  Eye,
-  
-} from "lucide-react";
-import { toast } from 'react-hot-toast';
+import { CloudSun, AlertTriangle, Info, Plus, Eye } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE =
   (typeof import.meta !== "undefined" &&
@@ -31,6 +25,7 @@ export default function Dashboard() {
   const { user, setMessage } = useAuth();
   const [crops, setCrops] = useState([]);
   const [loadingCrops, setLoadingCrops] = useState(true);
+  const navigate = useNavigate();
 
   const [weather, setWeather] = useState({
     temp: "32°C",
@@ -39,12 +34,18 @@ export default function Dashboard() {
     location: "Dhaka",
     fetched: false,
   });
-  const [upazila, setUpazila] = useState(() => localStorage.getItem('selectedUpazila') || 'Dhaka');
+  const [upazila, setUpazila] = useState(
+    () => localStorage.getItem("selectedUpazila") || "Dhaka"
+  );
   const [forecast, setForecast] = useState([]); // 5-day forecast array
   const [loadingWeather, setLoadingWeather] = useState(false);
 
   const [alerts, setAlerts] = useState([
-    { id: 1, text: "High humidity detected - improve ventilation", level: "high" },
+    {
+      id: 1,
+      text: "High humidity detected - improve ventilation",
+      level: "high",
+    },
     { id: 2, text: "Rain forecasted in 2 days", level: "medium" },
   ]);
   const [tips, setTips] = useState([
@@ -99,23 +100,41 @@ export default function Dashboard() {
 
   // Convert latin digits to Bangla digits (optional helper)
   function toBanglaDigits(input) {
-    const map = { '0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯' };
-    return String(input).split('').map(c => map[c] ?? c).join('');
+    const map = {
+      0: "০",
+      1: "১",
+      2: "২",
+      3: "৩",
+      4: "৪",
+      5: "৫",
+      6: "৬",
+      7: "৭",
+      8: "৮",
+      9: "৯",
+    };
+    return String(input)
+      .split("")
+      .map((c) => map[c] ?? c)
+      .join("");
   }
 
   // Geocode Upazila (Nominatim) -> {lat, lon, display_name}
   async function geocodeUpazila(name) {
     try {
-      const q = encodeURIComponent(name + ', Bangladesh');
+      const q = encodeURIComponent(name + ", Bangladesh");
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`;
-      const res = await fetch(url, { headers: { 'Accept-Language': 'bn' } });
+      const res = await fetch(url, { headers: { "Accept-Language": "bn" } });
       const arr = await res.json().catch(() => []);
       if (Array.isArray(arr) && arr.length > 0) {
         const r = arr[0];
-        return { lat: parseFloat(r.lat), lon: parseFloat(r.lon), display_name: r.display_name };
+        return {
+          lat: parseFloat(r.lat),
+          lon: parseFloat(r.lon),
+          display_name: r.display_name,
+        };
       }
     } catch (err) {
-      console.warn('Geocode failed', err);
+      console.warn("Geocode failed", err);
     }
     return null;
   }
@@ -125,7 +144,7 @@ export default function Dashboard() {
     if (!name) return;
     setLoadingWeather(true);
     try {
-      localStorage.setItem('selectedUpazila', name);
+      localStorage.setItem("selectedUpazila", name);
       const geo = await geocodeUpazila(name);
       const lat = geo?.lat ?? 23.8103;
       const lon = geo?.lon ?? 90.4125;
@@ -136,7 +155,7 @@ export default function Dashboard() {
       const d = await res.json().catch(() => ({}));
       if (res.ok && d.daily) {
         // Build a simple 5-day summary
-        const days = (d.daily.time || []).slice(0,5).map((t, i) => ({
+        const days = (d.daily.time || []).slice(0, 5).map((t, i) => ({
           date: t,
           temp_max: d.daily.temperature_2m_max?.[i],
           temp_min: d.daily.temperature_2m_min?.[i],
@@ -146,15 +165,18 @@ export default function Dashboard() {
         // get current humidity from hourly series nearest to current time
         let humidity = weather.humidity;
         if (d.hourly && d.hourly.relativehumidity_2m && d.hourly.time) {
-          const nowIso = new Date().toISOString().slice(0,13); // YYYY-MM-DDTHH
+          const nowIso = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
           // find first hourly index that starts with today's hour
-          const idx = d.hourly.time.findIndex(ts => ts.startsWith(nowIso));
-          if (idx >= 0) humidity = `${Math.round(d.hourly.relativehumidity_2m[idx])}%`;
+          const idx = d.hourly.time.findIndex((ts) => ts.startsWith(nowIso));
+          if (idx >= 0)
+            humidity = `${Math.round(d.hourly.relativehumidity_2m[idx])}%`;
         }
 
         setWeather((w) => ({
           ...w,
-          temp: `${Math.round(d.current_weather?.temperature ?? days[0]?.temp_max ?? 0)}°C`,
+          temp: `${Math.round(
+            d.current_weather?.temperature ?? days[0]?.temp_max ?? 0
+          )}°C`,
           humidity: humidity,
           rainfall: `${days[0]?.precip_prob ?? 0}%`,
           location: name,
@@ -163,7 +185,7 @@ export default function Dashboard() {
         setForecast(days);
       }
     } catch (err) {
-      console.error('Failed to fetch forecast', err);
+      console.error("Failed to fetch forecast", err);
     } finally {
       setLoadingWeather(false);
     }
@@ -171,29 +193,47 @@ export default function Dashboard() {
 
   // Generate a short Bangla advisory based on forecast and crops
   function generateBanglaAdvisory(forecastArr, cropList) {
-    if (!forecastArr || forecastArr.length === 0) return 'কোনো পূর্বাভাস পাওয়া যায়নি।';
+    if (!forecastArr || forecastArr.length === 0)
+      return "কোনো পূর্বাভাস পাওয়া যায়নি।";
     // Check next 3 days rain probability
-    const next3 = forecastArr.slice(0,3);
-    const maxRain = Math.max(...next3.map(d => d.precip_prob || 0));
-    const maxTemp = Math.max(...next3.map(d => d.temp_max || -999));
+    const next3 = forecastArr.slice(0, 3);
+    const maxRain = Math.max(...next3.map((d) => d.precip_prob || 0));
+    const maxTemp = Math.max(...next3.map((d) => d.temp_max || -999));
 
     const advices = [];
     if (maxRain >= 70) {
       // If any rice crops, recommend harvest or cover
-      const hasRice = (cropList || []).some(c => (c.cropType || c.type || '').toLowerCase().includes('rice') || (c.cropType || '').toLowerCase().includes('ধান'));
+      const hasRice = (cropList || []).some(
+        (c) =>
+          (c.cropType || c.type || "").toLowerCase().includes("rice") ||
+          (c.cropType || "").toLowerCase().includes("ধান")
+      );
       if (hasRice) {
-        advices.push(`আগামী ৩ দিন সম্ভবত বৃষ্টি ${toBanglaDigits(Math.round(maxRain))}% → আজই ধান কাটুন বা ঢেকে রাখুন`);
+        advices.push(
+          `আগামী ৩ দিন সম্ভবত বৃষ্টি ${toBanglaDigits(
+            Math.round(maxRain)
+          )}% → আজই ধান কাটুন বা ঢেকে রাখুন`
+        );
       } else {
-        advices.push(`আগামী ৩ দিন বৃষ্টির সম্ভাবনা ${toBanglaDigits(Math.round(maxRain))}% → সংরক্ষণ ও ঢেকে রাখুন`);
+        advices.push(
+          `আগামী ৩ দিন বৃষ্টির সম্ভাবনা ${toBanglaDigits(
+            Math.round(maxRain)
+          )}% → সংরক্ষণ ও ঢেকে রাখুন`
+        );
       }
     }
 
     if (maxTemp >= 36) {
-      advices.push(`তাপমাত্রা ${toBanglaDigits(Math.round(maxTemp))}°C পর্যন্ত উঠতে পারে → শীতল/ছায়া এবং সেচ রাখুন`);
+      advices.push(
+        `তাপমাত্রা ${toBanglaDigits(
+          Math.round(maxTemp)
+        )}°C পর্যন্ত উঠতে পারে → শীতল/ছায়া এবং সেচ রাখুন`
+      );
     }
 
-    if (advices.length === 0) return 'আবহাওয়া স্থিতিশীল দেখা যাচ্ছে — রোজ সকালে আবহাওয়া পরীক্ষা করুন।';
-    return advices.join(' । ');
+    if (advices.length === 0)
+      return "আবহাওয়া স্থিতিশীল দেখা যাচ্ছে — রোজ সকালে আবহাওয়া পরীক্ষা করুন।";
+    return advices.join(" । ");
   }
 
   // Handle form input
@@ -231,9 +271,13 @@ export default function Dashboard() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const errs = data?.errors ?? (data?.message ? [data.message] : ["Failed to create"]);
+        const errs =
+          data?.errors ??
+          (data?.message ? [data.message] : ["Failed to create"]);
         setErrors(errs);
-        try { errs.forEach(e => toast.error(String(e))); } catch (e) {}
+        try {
+          errs.forEach((e) => toast.error(String(e)));
+        } catch (e) {}
       } else {
         const created = data?.data ?? data;
         setCrops((prev) => [created, ...prev]);
@@ -247,27 +291,36 @@ export default function Dashboard() {
           storageType: "Silo",
           notes: "",
         });
-        try { toast.success('Crop created successfully.'); } catch (e) { /* ignore if toast not available */ }
-        if (typeof setMessage === "function") setMessage("Crop created successfully.");
+        try {
+          toast.success("Crop created successfully.");
+        } catch (e) {
+          /* ignore if toast not available */
+        }
+        if (typeof setMessage === "function")
+          setMessage("Crop created successfully.");
       }
     } catch (err) {
       const msg = "Network or server error creating crop.";
       setErrors([msg]);
-      try { toast.error(msg); } catch (e) {}
+      try {
+        toast.error(msg);
+      } catch (e) {}
       console.error(err);
     } finally {
       setCreating(false);
     }
   }
 
-  
-
   return (
     <div className="min-h-screen bg-[#F5FFF6] px-8 py-8 mt-20">
       {/* Header */}
       <div className="mb-6">
-        <div className="text-sm text-green-600">Friday, {new Date().toLocaleDateString()}</div>
-        <h1 className="text-3xl font-extrabold text-[#0b5f37] mt-2">Welcome Back, {user?.name || "Farmer"} 👋</h1>
+        <div className="text-sm text-green-600">
+          Friday, {new Date().toLocaleDateString()}
+        </div>
+        <h1 className="text-3xl font-extrabold text-[#0b5f37] mt-2">
+          Welcome Back, {user?.name || "Farmer"} 👋
+        </h1>
       </div>
 
       {/* Quick Actions row */}
@@ -293,6 +346,7 @@ export default function Dashboard() {
           variants={fadeUp}
           whileHover={{ scale: 1.02 }}
           className="flex items-center gap-3 bg-[#fff7e6] border border-[#f3dfb0] rounded-xl px-6 py-4 shadow-sm"
+          onClick={() => navigate("/warnings")}
         >
           <div className="w-9 h-9 rounded-full bg-[#fff2d8] flex items-center justify-center text-[#b06f00]">
             <AlertTriangle size={16} />
@@ -304,6 +358,7 @@ export default function Dashboard() {
           variants={fadeUp}
           whileHover={{ scale: 1.02 }}
           className="flex items-center gap-3 bg-[#f0fff6] border border-[#cdeed8] rounded-xl px-6 py-4 shadow-sm"
+          onClick={() => navigate("/scan-crop")}
         >
           <div className="w-9 h-9 rounded-full bg-[#eaf9ef] flex items-center justify-center text-[#0d7a4e]">
             <CloudSun size={16} />
@@ -324,7 +379,9 @@ export default function Dashboard() {
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-xl font-bold">Weather Highlight</h2>
-                <div className="text-sm mt-1 opacity-90">{weather.location}</div>
+                <div className="text-sm mt-1 opacity-90">
+                  {weather.location}
+                </div>
               </div>
               <div className="text-2xl opacity-80">
                 <CloudSun />
@@ -346,7 +403,9 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <a className="mt-4 inline-block text-sm underline text-white/90">5-Day Forecast →</a>
+            <a className="mt-4 inline-block text-sm underline text-white/90">
+              5-Day Forecast →
+            </a>
           </motion.div>
 
           {/* Crop Batches List (full width under weather) */}
@@ -357,25 +416,38 @@ export default function Dashboard() {
             className="bg-white rounded-2xl p-5 shadow-md border border-[#ecf8f0]"
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-[#0b5f37]">Your Crop Batches</h3>
-              <a className="text-sm text-green-600 flex items-center gap-2"><Eye size={14} /> View All</a>
+              <h3 className="text-lg font-semibold text-[#0b5f37]">
+                Your Crop Batches
+              </h3>
+              <a className="text-sm text-green-600 flex items-center gap-2">
+                <Eye size={14} /> View All
+              </a>
             </div>
 
             <div className="space-y-3">
               {loadingCrops ? (
                 <div className="text-sm text-gray-500">Loading...</div>
               ) : crops.length === 0 ? (
-                <div className="text-sm text-gray-600">No crop batches yet. Add one to get started.</div>
+                <div className="text-sm text-gray-600">
+                  No crop batches yet. Add one to get started.
+                </div>
               ) : (
                 crops.map((c, i) => {
                   // normalize fields that may be in different shapes
                   const id = c._id ?? c.id ?? i;
                   const cropType = c.cropType ?? c.type ?? "Crop";
                   const weight = c.estimatedWeightKg ?? c.weight ?? "";
-                  const area = (c.storageLocation && (c.storageLocation.division || c.storageLocation.district))
-                    ? `${c.storageLocation.division || ""}${c.storageLocation.division && c.storageLocation.district ? " · " : ""}${c.storageLocation.district || ""}`
-                    : (c.storageLocation || "");
-                  const risk = (c.risk || c.priority || c.status || "Low");
+                  const area =
+                    c.storageLocation &&
+                    (c.storageLocation.division || c.storageLocation.district)
+                      ? `${c.storageLocation.division || ""}${
+                          c.storageLocation.division &&
+                          c.storageLocation.district
+                            ? " · "
+                            : ""
+                        }${c.storageLocation.district || ""}`
+                      : c.storageLocation || "";
+                  const risk = c.risk || c.priority || c.status || "Low";
                   return (
                     <motion.div
                       key={id}
@@ -385,21 +457,44 @@ export default function Dashboard() {
                       <div className="flex items-center gap-3">
                         <div className="w-11 h-11 rounded-xl bg-[#eaf7ee] flex items-center justify-center text-[#0aa05a]">
                           {/* simple box icon */}
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7" stroke="#0aa05a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M3 7l9 6 9-6" stroke="#0aa05a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"
+                              stroke="#0aa05a"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M3 7l9 6 9-6"
+                              stroke="#0aa05a"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </div>
 
                         <div>
-                          <div className="font-semibold text-[#0b5f37]">{cropType}</div>
-                          <div className="text-xs text-[#4ea67b] mt-1">{weight ? `${weight} kg · ${area}` : area}</div>
+                          <div className="font-semibold text-[#0b5f37]">
+                            {cropType}
+                          </div>
+                          <div className="text-xs text-[#4ea67b] mt-1">
+                            {weight ? `${weight} kg · ${area}` : area}
+                          </div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3">
                         <div>
-                          <RiskBadge level={(c.risk || c.priority || c.status || "Low")} />
+                          <RiskBadge
+                            level={c.risk || c.priority || c.status || "Low"}
+                          />
                         </div>
                       </div>
                     </motion.div>
@@ -412,7 +507,12 @@ export default function Dashboard() {
 
         {/* Right column: Alerts + Tips */}
         <div className="flex flex-col gap-5">
-          <motion.div variants={fadeUp} initial="hidden" animate="show" className="bg-white rounded-2xl p-5 shadow-[0_18px_36px_rgba(31,37,46,0.06)] border border-[#f7ecec]">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="bg-white rounded-2xl p-5 shadow-[0_18px_36px_rgba(31,37,46,0.06)] border border-[#f7ecec]"
+          >
             <div className="flex items-center gap-3 mb-2">
               <div className="w-9 h-9 rounded-full bg-[#fff3f3] flex items-center justify-center text-red-600">
                 <AlertTriangle />
@@ -422,14 +522,26 @@ export default function Dashboard() {
 
             <div className="space-y-3">
               {alerts.map((a) => (
-                <div key={a.id} className={`p-3 rounded-md ${a.level === "high" ? "bg-red-50 border-l-4 border-red-300 text-red-700" : "bg-yellow-50 border-l-4 border-yellow-300 text-yellow-700"}`}>
+                <div
+                  key={a.id}
+                  className={`p-3 rounded-md ${
+                    a.level === "high"
+                      ? "bg-red-50 border-l-4 border-red-300 text-red-700"
+                      : "bg-yellow-50 border-l-4 border-yellow-300 text-yellow-700"
+                  }`}
+                >
                   {a.text}
                 </div>
               ))}
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} initial="hidden" animate="show" className="bg-[#0b6d3d] text-white rounded-2xl p-5 shadow-[0_18px_36px_rgba(7,96,50,0.08)]">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="bg-[#0b6d3d] text-white rounded-2xl p-5 shadow-[0_18px_36px_rgba(7,96,50,0.08)]"
+          >
             <div className="flex items-center gap-3 mb-2">
               <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white">
                 <Info />
@@ -462,31 +574,93 @@ export default function Dashboard() {
               className="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-lg"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-[#0b5f37]">Add New Crop Batch</h3>
-                <button onClick={() => setShowCreate(false)} className="text-gray-500">✕</button>
+                <h3 className="text-xl font-semibold text-[#0b5f37]">
+                  Add New Crop Batch
+                </h3>
+                <button
+                  onClick={() => setShowCreate(false)}
+                  className="text-gray-500"
+                >
+                  ✕
+                </button>
               </div>
 
               {errors.length > 0 && (
-                <div className="mb-3 bg-red-50 text-red-700 p-3 rounded">{errors.map((e,i) => <div key={i}>{e}</div>)}</div>
+                <div className="mb-3 bg-red-50 text-red-700 p-3 rounded">
+                  {errors.map((e, i) => (
+                    <div key={i}>{e}</div>
+                  ))}
+                </div>
               )}
 
               <form onSubmit={handleCreate} className="grid grid-cols-2 gap-4">
-                <input name="cropType" value={form.cropType} onChange={handleFormChange} placeholder="Crop (e.g. Rice)" className="col-span-2 border p-3 rounded" />
-                <input name="estimatedWeightKg" value={form.estimatedWeightKg} onChange={handleFormChange} placeholder="Estimated weight (kg)" className="border p-3 rounded" />
-                <input name="harvestDate" value={form.harvestDate} onChange={handleFormChange} type="date" className="border p-3 rounded" />
-                <input name="storageDivision" value={form.storageDivision} onChange={handleFormChange} placeholder="Storage Division" className="border p-3 rounded" />
-                <input name="storageDistrict" value={form.storageDistrict} onChange={handleFormChange} placeholder="Storage District" className="border p-3 rounded" />
-                <select name="storageType" value={form.storageType} onChange={handleFormChange} className="border p-3 rounded">
+                <input
+                  name="cropType"
+                  value={form.cropType}
+                  onChange={handleFormChange}
+                  placeholder="Crop (e.g. Rice)"
+                  className="col-span-2 border p-3 rounded"
+                />
+                <input
+                  name="estimatedWeightKg"
+                  value={form.estimatedWeightKg}
+                  onChange={handleFormChange}
+                  placeholder="Estimated weight (kg)"
+                  className="border p-3 rounded"
+                />
+                <input
+                  name="harvestDate"
+                  value={form.harvestDate}
+                  onChange={handleFormChange}
+                  type="date"
+                  className="border p-3 rounded"
+                />
+                <input
+                  name="storageDivision"
+                  value={form.storageDivision}
+                  onChange={handleFormChange}
+                  placeholder="Storage Division"
+                  className="border p-3 rounded"
+                />
+                <input
+                  name="storageDistrict"
+                  value={form.storageDistrict}
+                  onChange={handleFormChange}
+                  placeholder="Storage District"
+                  className="border p-3 rounded"
+                />
+                <select
+                  name="storageType"
+                  value={form.storageType}
+                  onChange={handleFormChange}
+                  className="border p-3 rounded"
+                >
                   <option>Silo</option>
                   <option>Jute Bag Stack</option>
                   <option>Open Area</option>
                 </select>
 
-                <textarea name="notes" value={form.notes} onChange={handleFormChange} placeholder="Notes" className="col-span-2 border p-3 rounded h-24"></textarea>
+                <textarea
+                  name="notes"
+                  value={form.notes}
+                  onChange={handleFormChange}
+                  placeholder="Notes"
+                  className="col-span-2 border p-3 rounded h-24"
+                ></textarea>
 
                 <div className="col-span-2 flex justify-end gap-3 mt-2">
-                  <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 rounded border">Cancel</button>
-                  <button type="submit" disabled={creating} className="px-4 py-2 rounded bg-[#0f7a48] text-white">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreate(false)}
+                    className="px-4 py-2 rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creating}
+                    className="px-4 py-2 rounded bg-[#0f7a48] text-white"
+                  >
                     {creating ? "Saving..." : "Save Crop"}
                   </button>
                 </div>
@@ -503,8 +677,20 @@ export default function Dashboard() {
 function RiskBadge({ level }) {
   const lvl = (level || "low").toString().toLowerCase();
   if (lvl === "high")
-    return <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 text-sm font-semibold">High</span>;
+    return (
+      <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 text-sm font-semibold">
+        High
+      </span>
+    );
   if (lvl === "medium")
-    return <span className="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-sm font-semibold">Medium</span>;
-  return <span className="px-3 py-1 rounded-full bg-green-50 text-green-800 text-sm font-semibold">Low</span>;
+    return (
+      <span className="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-sm font-semibold">
+        Medium
+      </span>
+    );
+  return (
+    <span className="px-3 py-1 rounded-full bg-green-50 text-green-800 text-sm font-semibold">
+      Low
+    </span>
+  );
 }
