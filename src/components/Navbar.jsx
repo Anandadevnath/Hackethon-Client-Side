@@ -1,6 +1,5 @@
 
 import React, { useRef, useState, useEffect } from "react";
-import "./Navbar.css";
 import logoEn from "../assets/Gemini_Generated_Image_ppkkebppkkebppkk-removebg-preview.png";
 import logoBn from "../assets/Gemini_Generated_Image_ld4a7tld4a7tld4a-removebg-preview.png";
 import { Link, useNavigate } from 'react-router-dom';
@@ -32,7 +31,6 @@ const Navbar = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      // when user scrolls down a bit, toggle scrolled state so navbar becomes fixed
       setScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -41,45 +39,45 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={"navbar" + (scrolled ? ' scrolled' : '')}>
-      <div className="navbar-inner">
-        <div className="navbar-left">
-          <div className="navbar-wordmark">
-            <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" />
+    <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-60 box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159,240,177,0.138)_0%,rgba(154,255,126,0.114)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
+      <div className="max-w-[1450px] mx-auto px-7 flex items-center justify-between min-h-[72px]">
+        <div className="flex items-center">
+          <div className="flex items-center">
+            <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-[77px] block" />
           </div>
         </div>
-        <div className="navbar-right">
-        <button className="navbar-lang" onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')}>
-          <span role="img" aria-label="language" style={{color:'#1ecfff', fontSize:'1.1em'}}>🌐</span>
-          <span style={{color:'#fffbe6', fontWeight:600, marginLeft:8}}>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
-        </button>
-        <a href="#about" className="navbar-link">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</a>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
+            <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
+            <span className="text-[#fffbe6] font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
+          </button>
 
-        {user ? (
-          <Link to="/dashboard" className="navbar-dashboard">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
-        ) : null}
+          <a href="#about" className="text-[#fffbe6] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</a>
 
-        {user ? (
-          <div className="navbar-profile" ref={wrapperRef}>
-            <div className="profile-trigger" onClick={() => setMenuOpen(v => !v)} role="button" tabIndex={0}>
-              {user.avatar ? (
-                <img src={user.avatar} alt={user.name || 'Profile'} className="profile-avatar" />
-              ) : (
-                <div className="profile-avatar fallback">{(user.name && user.name[0]) || 'U'}</div>
-              )}
-              <span className="profile-name">{user.name || user.email || 'User'}</span>
+          {user ? (
+            <Link to="/dashboard" className="bg-white/90 text-[#0b6b3a] px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.06)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
+          ) : null}
+
+          {user ? (
+            <div className="relative flex items-center" ref={wrapperRef}>
+              <div className="flex items-center gap-2 cursor-pointer text-[#fffbe6]" onClick={() => setMenuOpen(v => !v)} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setMenuOpen(v => !v)}>
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name || 'Profile'} className="w-11 h-11 rounded-full object-cover border-2 border-white/12" />
+                ) : (
+                  <div className="w-11 h-11 rounded-full inline-flex items-center justify-center bg-black/15 text-[#fffbe6] font-bold">{(user.name && user.name[0]) || 'U'}</div>
+                )}
+                <span className="text-[#fffbe6] font-semibold">{user.name || user.email || 'User'}</span>
+              </div>
+
+              <div className={`absolute right-0 top-full mt-2 bg-gradient-to-b from-white to-[#fbfff8] text-[#0a4d2c] rounded-[10px] shadow-[0_10px_28px_rgba(6,40,20,0.12)] min-w-[180px] flex flex-col overflow-hidden z-60 transition-all duration-150 ${menuOpen ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-1 invisible pointer-events-none'}`}>
+                <Link to="/dashboard" className="px-4 py-3 text-left no-underline" onClick={() => setMenuOpen(false)}>{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
+                <Link to="/profile" className="px-4 py-3 text-left no-underline" onClick={() => setMenuOpen(false)}>{lang === 'en' ? 'Profile' : 'প্রোফাইল'}</Link>
+                <button className="px-4 py-3 text-left" onClick={handleLogout}>{lang === 'en' ? 'Logout' : 'লগআউট'}</button>
+              </div>
             </div>
-            <div className={"profile-menu" + (menuOpen ? ' open' : '')}>
-              <Link to="/dashboard" className="profile-menu-item" onClick={() => setMenuOpen(false)}>{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
-              <Link to="/profile" className="profile-menu-item" onClick={() => setMenuOpen(false)}>{lang === 'en' ? 'Profile' : 'প্রোফাইল'}</Link>
-              <button className="profile-menu-item" onClick={handleLogout}>{lang === 'en' ? 'Logout' : 'লগআউট'}</button>
-            </div>
-          </div>
-        ) : (
-          <Link to="/login" className="navbar-cta" style={{textDecoration:'none'}}>
-            {lang === 'en' ? 'Join the Movement' : 'যোগ দিন'}
-          </Link>
-        )}
+          ) : (
+            <Link to="/login" className="bg-gradient-to-r from-[#9ef96a] to-[#49c74f] text-[#05310d] rounded-[28px] px-4 py-2 font-bold no-underline shadow-[0_10px_30px_rgba(46,125,50,0.18),0_0_0_6px_rgba(73,199,79,0.06)] transition-transform duration-150 hover:-translate-y-1">{lang === 'en' ? 'Join the Movement' : 'যোগ দিন'}</Link>
+          )}
         </div>
       </div>
     </nav>
