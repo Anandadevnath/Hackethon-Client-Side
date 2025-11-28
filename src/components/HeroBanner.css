@@ -1,6 +1,5 @@
 .hero {
   position: relative;
-  /* increased height to make banner more prominent */
   min-height: 92vh;
   display: flex;
   align-items: center;
@@ -22,12 +21,12 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1410px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 420px;
   gap: 36px;
-  padding: 100px 28px;
+  padding: 96px 28px;
   align-items: center;
 }
 
@@ -48,26 +47,39 @@
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
+:root{
+  --hero-heading-min: 28px;
+  --hero-heading-max: 56px;
+  --hero-body-min: 15px;
+  --hero-body-max: 20px;
+}
+
 .hero__title {
-  margin: 18px 0 14px;
-  font-size: 56px;
-  line-height: 1.02;
+  margin: 24px 0 22px;
+  /* responsive, adjustable heading */
+  font-size: clamp(var(--hero-heading-min), 6.6vw, var(--hero-heading-max));
+  line-height: 1.03;
   font-weight: 800;
-  letter-spacing: -0.6px;
+  letter-spacing: -0.8px;
   color: #ffffff;
+  /* subtle text-shadow to keep contrast on busy backgrounds */
+  text-shadow: 0 6px 18px rgba(3,10,6,0.35);
 }
 
 .hero__desc {
   max-width: 640px;
-  color: rgba(235, 249, 237, 0.9);
-  margin-bottom: 20px;
-  font-size: 1.05rem;
+  color: rgba(235, 249, 237, 0.95);
+  margin-bottom: 28px;
+  /* responsive body size */
+  font-size: clamp(var(--hero-body-min), 1.2vw, var(--hero-body-max));
+  line-height: 1.65;
+  opacity: 0.98;
 }
 
 .hero__actions {
   display: flex;
-  gap: 14px;
-  align-items: center
+  gap: 20px;
+  align-items: center;
 }
 
 .btn {
@@ -152,7 +164,7 @@
   }
 
   .hero__title {
-    font-size: 44px;
+    font-size: clamp(26px, 6.6vw, 40px);
   }
 }
 
@@ -173,7 +185,7 @@
   }
 
   .hero__title {
-    font-size: 34px;
+    font-size: 30px;
   }
 
   .mission-card {
