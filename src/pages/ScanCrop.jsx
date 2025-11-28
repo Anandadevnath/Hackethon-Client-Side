@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const API_URL = "http://localhost:3001";
+// Backend server runs on port 3000 by default (see server.js)
+const API_URL = "http://localhost:8000";
 
 const STRINGS = {
   bn: {
