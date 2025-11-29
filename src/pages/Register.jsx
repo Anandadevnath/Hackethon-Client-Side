@@ -5,8 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import bdLocations from '../data/bd-locations.json';
 
-const API_BASE = "https://hackethon-server-side-1.onrender.com"; 
-
 const Register = () => {
   const { lang } = useLanguage();
   const isBn = lang === 'bn';

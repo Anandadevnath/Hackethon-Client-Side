@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 import { Sparkles, User, Phone, Image as ImageIcon, MapPin, Globe, KeyRound, CheckCircle } from 'lucide-react';
 
 const Profile = () => {
@@ -41,8 +42,18 @@ const Profile = () => {
 
     const result = await updateProfile(updates);
 
-    if (result.ok) setStatus('Profile updated successfully ✨');
-    else setStatus(result.data?.message || 'Update failed');
+    if (result.ok) {
+      setStatus('Profile updated successfully ✨');
+      try {
+        toast.success(result.data?.message || 'Profile updated successfully ✨');
+      } catch (e) {}
+    } else {
+      const msg = result.data?.message || 'Update failed';
+      setStatus(msg);
+      try {
+        toast.error(msg);
+      } catch (e) {}
+    }
   };
 
   const sendOtp = async () => {
@@ -92,7 +103,7 @@ const Profile = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-[calc(100vh-120px)] flex items-center justify-center p-10 bg-gradient-to-br from-green-50 to-green-200"
+      className="min-h-[calc(100vh-120px)] flex items-center justify-center pt-[96px] md:pt-[120px] p-10 bg-gradient-to-br from-green-50 to-green-200"
     >
       <motion.div
         initial={{ y: 40, opacity: 0 }}
