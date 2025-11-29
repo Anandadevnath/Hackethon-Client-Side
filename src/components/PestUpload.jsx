@@ -88,12 +88,16 @@ export default function PestUpload({ division = null, district = null }) {
       </div>
 
       {imagePreview && (
-        <div style={{ marginBottom: "12px" }}>
+        <div style={{ marginBottom: "12px", display: "flex", justifyContent: "center" }}>
           <img
             src={imagePreview}
             alt="Preview"
             style={{
-              maxWidth: "100%",
+              display: "block",
+              width: "auto",
+              maxWidth: "260px",
+              height: "auto",
+              objectFit: "contain",
               borderRadius: "12px",
               border: "1px solid #e5e7eb",
             }}
