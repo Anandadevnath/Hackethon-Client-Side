@@ -31,10 +31,11 @@ export default function Dashboard() {
     location: "Dhaka",
     fetched: false,
   });
-  const [upazila, setUpazila] = useState(
-    () => localStorage.getItem("selectedUpazila") || "Dhaka"
+
+  const [upazila, setUpazila] = useState(() =>
+    localStorage.getItem("selectedUpazila") || ""
   );
-  const [forecast, setForecast] = useState([]); // 5-day forecast array
+  const [forecast, setForecast] = useState([]); 
   const [loadingWeather, setLoadingWeather] = useState(false);
 
   const [alerts, setAlerts] = useState([
@@ -51,7 +52,6 @@ export default function Dashboard() {
     "Temperature rising - improve ventilation",
   ]);
 
-  // Create crop modal & form
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({
@@ -66,7 +66,6 @@ export default function Dashboard() {
   const [errors, setErrors] = useState([]);
   const [availableDistricts, setAvailableDistricts] = useState([]);
 
-  // Edit crop modal & form
   const [showEdit, setShowEdit] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -82,11 +81,42 @@ export default function Dashboard() {
   const [editErrors, setEditErrors] = useState([]);
   const [editAvailableDistricts, setEditAvailableDistricts] = useState([]);
 
-  // Load crops
   useEffect(() => {
     loadCrops();
-    loadWeatherForUpazila(upazila);
   }, []);
+
+  useEffect(() => {
+    try {
+      const local = (localStorage.getItem("selectedUpazila") || "").trim();
+      if (user) {
+        let candidate = "";
+        if (typeof user.location === "object" && user.location !== null) {
+          candidate = user.location.upazila || user.location.district || user.location.division || "";
+        } else if (typeof user.location === "string") {
+          candidate = user.location.split(",")[0]?.trim() || "";
+        }
+        if (candidate && (!local || local === "Dhaka")) {
+          setUpazila(candidate);
+          return;
+        }
+      }
+
+      if (local) {
+        if (!upazila) setUpazila(local);
+        return;
+      }
+    } catch (err) {
+      console.warn('Failed to derive upazila from user profile', err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!upazila) return;
+    try {
+      localStorage.setItem("selectedUpazila", upazila);
+    } catch (e) {}
+    loadWeatherForUpazila(upazila);
+  }, [upazila]);
 
   async function loadCrops() {
     setLoadingCrops(true);
@@ -148,7 +178,6 @@ export default function Dashboard() {
     return null;
   }
 
-  // Fetch 5-day forecast from Open-Meteo for an Upazila name
   async function loadWeatherForUpazila(name) {
     if (!name) return;
     setLoadingWeather(true);
@@ -158,12 +187,10 @@ export default function Dashboard() {
       const lat = geo?.lat ?? 23.8103;
       const lon = geo?.lon ?? 90.4125;
 
-      // Request daily precipitation probability and temperature, plus hourly humidity
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=relativehumidity_2m&current_weather=true&timezone=Asia%2FDhaka`;
       const res = await fetch(url);
       const d = await res.json().catch(() => ({}));
       if (res.ok && d.daily) {
-        // Build a simple 5-day summary
         const days = (d.daily.time || []).slice(0, 5).map((t, i) => ({
           date: t,
           temp_max: d.daily.temperature_2m_max?.[i],
@@ -171,11 +198,9 @@ export default function Dashboard() {
           precip_prob: d.daily.precipitation_probability_max?.[i] ?? 0,
         }));
 
-        // get current humidity from hourly series nearest to current time
         let humidity = weather.humidity;
         if (d.hourly && d.hourly.relativehumidity_2m && d.hourly.time) {
-          const nowIso = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-          // find first hourly index that starts with today's hour
+          const nowIso = new Date().toISOString().slice(0, 13); 
           const idx = d.hourly.time.findIndex((ts) => ts.startsWith(nowIso));
           if (idx >= 0)
             humidity = `${Math.round(d.hourly.relativehumidity_2m[idx])}%`;
