@@ -66,6 +66,22 @@ export default function Dashboard() {
   const [errors, setErrors] = useState([]);
   const [availableDistricts, setAvailableDistricts] = useState([]);
 
+  // Edit crop modal & form
+  const [showEdit, setShowEdit] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({
+    cropType: "",
+    estimatedWeightKg: "",
+    harvestDate: "",
+    storageDivision: "",
+    storageDistrict: "",
+    storageType: "",
+    notes: "",
+  });
+  const [editErrors, setEditErrors] = useState([]);
+  const [editAvailableDistricts, setEditAvailableDistricts] = useState([]);
+
   // Load crops
   useEffect(() => {
     loadCrops();
@@ -302,6 +318,114 @@ export default function Dashboard() {
       console.error(err);
     } finally {
       setCreating(false);
+    }
+  }
+
+  // Open edit modal with crop data
+  function openEditModal(crop) {
+    const id = crop._id ?? crop.id;
+    setEditingId(id);
+    
+    const division = crop.storageLocation?.division || "";
+    const districts = DISTRICTS_BY_DIVISION[division] || [];
+    setEditAvailableDistricts(districts);
+    
+    setEditForm({
+      cropType: crop.cropType ?? crop.type ?? "Rice",
+      estimatedWeightKg: crop.estimatedWeightKg ?? crop.weight ?? "",
+      harvestDate: crop.harvestDate ? crop.harvestDate.split('T')[0] : "",
+      storageDivision: division,
+      storageDistrict: crop.storageLocation?.district || "",
+      storageType: crop.storageType ?? "Silo",
+      notes: crop.notes ?? "",
+    });
+    setEditErrors([]);
+    setShowEdit(true);
+  }
+
+  // Handle edit form input
+  function handleEditFormChange(e) {
+    const { name, value } = e.target;
+    setEditForm((f) => ({ ...f, [name]: value }));
+    
+    if (name === 'storageDivision') {
+      const districts = DISTRICTS_BY_DIVISION[value] || [];
+      setEditAvailableDistricts(districts);
+      setEditForm((f) => ({ ...f, storageDistrict: '' }));
+    }
+  }
+
+  // Submit edit crop
+  async function handleEdit(e) {
+    e.preventDefault();
+    setEditErrors([]);
+    setEditing(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const body = {
+        cropType: editForm.cropType,
+        estimatedWeightKg: Number(editForm.estimatedWeightKg || 0),
+        harvestDate: editForm.harvestDate,
+        storageLocation: {
+          division: editForm.storageDivision,
+          district: editForm.storageDistrict,
+        },
+        storageType: editForm.storageType,
+        notes: editForm.notes,
+      };
+
+      const { ok, data } = await api.patch(`/crop/update/${editingId}`, body, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
+      if (!ok) {
+        const errs =
+          data?.errors ??
+          (data?.message ? [data.message] : ["Failed to update"]);
+        setEditErrors(errs);
+        errs.forEach((e) => toast.error(String(e)));
+      } else {
+        const updated = data?.data ?? data;
+        setCrops((prev) =>
+          prev.map((c) => ((c._id ?? c.id) === editingId ? updated : c))
+        );
+        setShowEdit(false);
+        setEditingId(null);
+        toast.success("Crop updated successfully.");
+      }
+    } catch (err) {
+      const msg = "Network or server error updating crop.";
+      setEditErrors([msg]);
+      toast.error(msg);
+      console.error(err);
+    } finally {
+      setEditing(false);
+    }
+  }
+
+  // Delete crop
+  async function deleteCrop(id) {
+    if (!confirm("Are you sure you want to delete this crop batch?")) return;
+    
+    try {
+      const token = localStorage.getItem("accessToken");
+      const { ok, data } = await api.del(`/crop/delete/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (!ok) {
+        const msg = data?.message || "Failed to delete crop.";
+        toast.error(msg);
+      } else {
+        setCrops((prev) => prev.filter((c) => (c._id ?? c.id) !== id));
+        toast.success("Crop deleted successfully.");
+      }
+    } catch (err) {
+      toast.error("Network or server error deleting crop.");
+      console.error(err);
     }
   }
 
@@ -758,6 +882,192 @@ export default function Dashboard() {
                     className="px-4 py-2 rounded bg-[#0f7a48] text-white"
                   >
                     {creating ? "Saving..." : "Save Crop"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit modal */}
+      <AnimatePresence>
+        {showEdit && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-lg"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-[#0b5f37]">
+                  Edit Crop Batch
+                </h3>
+                <button
+                  onClick={() => setShowEdit(false)}
+                  className="text-gray-500"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {editErrors.length > 0 && (
+                <div className="mb-3 bg-red-50 text-red-700 p-3 rounded">
+                  {editErrors.map((e, i) => (
+                    <div key={i}>{e}</div>
+                  ))}
+                </div>
+              )}
+
+              <form onSubmit={handleEdit} className="grid grid-cols-2 gap-4">
+                {/* Crop Type Dropdown */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ফসলের ধরন / Crop Type
+                  </label>
+                  <select
+                    name="cropType"
+                    value={editForm.cropType}
+                    onChange={handleEditFormChange}
+                    className="w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value="">-- Select Crop / ফসল নির্বাচন করুন --</option>
+                    {CROP_TYPES.map((crop) => (
+                      <option key={crop.value} value={crop.value}>
+                        {crop.bn} ({crop.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Estimated Weight */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    আনুমানিক ওজন (কেজি)
+                  </label>
+                  <input
+                    name="estimatedWeightKg"
+                    value={editForm.estimatedWeightKg}
+                    onChange={handleEditFormChange}
+                    placeholder="e.g. 500"
+                    type="number"
+                    min="0"
+                    className="w-full border p-3 rounded focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* Harvest Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ফসল কাটার তারিখ
+                  </label>
+                  <input
+                    name="harvestDate"
+                    value={editForm.harvestDate}
+                    onChange={handleEditFormChange}
+                    type="date"
+                    className="w-full border p-3 rounded focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* Division Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    বিভাগ / Division
+                  </label>
+                  <select
+                    name="storageDivision"
+                    value={editForm.storageDivision}
+                    onChange={handleEditFormChange}
+                    className="w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">-- বিভাগ নির্বাচন করুন --</option>
+                    {DIVISIONS.map((div) => (
+                      <option key={div.value} value={div.value}>
+                        {div.bn} ({div.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* District Dropdown (depends on Division) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    জেলা / District
+                  </label>
+                  <select
+                    name="storageDistrict"
+                    value={editForm.storageDistrict}
+                    onChange={handleEditFormChange}
+                    disabled={!editForm.storageDivision}
+                    className={`w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500 ${
+                      !editForm.storageDivision ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <option value="">
+                      {editForm.storageDivision ? '-- জেলা নির্বাচন করুন --' : '-- প্রথমে বিভাগ নির্বাচন করুন --'}
+                    </option>
+                    {editAvailableDistricts.map((dist) => (
+                      <option key={dist.value} value={dist.value}>
+                        {dist.bn} ({dist.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Storage Type Dropdown */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    সংরক্ষণ পদ্ধতি / Storage Type
+                  </label>
+                  <select
+                    name="storageType"
+                    value={editForm.storageType}
+                    onChange={handleEditFormChange}
+                    className="w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500"
+                  >
+                    {STORAGE_TYPES.map((storage) => (
+                      <option key={storage.value} value={storage.value}>
+                        {storage.bn} ({storage.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Notes */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    নোট / Notes
+                  </label>
+                  <textarea
+                    name="notes"
+                    value={editForm.notes}
+                    onChange={handleEditFormChange}
+                    placeholder="অতিরিক্ত তথ্য লিখুন..."
+                    className="w-full border p-3 rounded h-24 focus:ring-2 focus:ring-green-500"
+                  ></textarea>
+                </div>
+
+                <div className="col-span-2 flex justify-end gap-3 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowEdit(false)}
+                    className="px-4 py-2 rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editing}
+                    className="px-4 py-2 rounded bg-[#0f7a48] text-white"
+                  >
+                    {editing ? "Updating..." : "Update Crop"}
                   </button>
                 </div>
               </form>
