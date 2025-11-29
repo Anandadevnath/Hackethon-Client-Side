@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { Sparkles, User, Phone, Image as ImageIcon, MapPin, Globe, KeyRound, Edit3, X, Mail, CheckCircle } from 'lucide-react';
+import { Sparkles, User, Phone, Image as ImageIcon, MapPin, Globe, KeyRound, Edit3, X, Mail, CheckCircle, Lock, Send, ShieldCheck } from 'lucide-react';
 import bdLocations from '../data/bd-locations.json';
 
 const Profile = () => {
@@ -23,10 +23,15 @@ const Profile = () => {
   const [upazila, setUpazila] = useState('');
   const [status, setStatus] = useState('');
   const [otpStatus, setOtpStatus] = useState('');
+  const [otpStatusType, setOtpStatusType] = useState(''); // 'success', 'error', 'info'
   const [otp, setOtp] = useState('');
   const [resetToken, setResetToken] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [settingPassword, setSettingPassword] = useState(false);
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
   const navigate = useNavigate();
 
   // Get districts based on selected division
@@ -113,46 +118,106 @@ const Profile = () => {
 
   const sendOtp = async () => {
     setOtpStatus('');
+    setOtpStatusType('');
+    setSendingOtp(true);
     try {
       const { ok, data } = await api.post('/user/forgot-password', { email: user?.email });
-      if (ok) setOtpStatus(data?.message || (isBn ? 'OTP পাঠানো হয়েছে! ইমেইল চেক করুন।' : 'OTP sent! Check your email.'));
-      else setOtpStatus(data?.message || (isBn ? 'OTP পাঠাতে ব্যর্থ' : 'Failed to send OTP'));
+      if (ok) {
+        setOtpStatus(data?.message || (isBn ? 'OTP পাঠানো হয়েছে! ইমেইল চেক করুন।' : 'OTP sent! Check your email.'));
+        setOtpStatusType('success');
+      } else {
+        setOtpStatus(data?.message || (isBn ? 'OTP পাঠাতে ব্যর্থ' : 'Failed to send OTP'));
+        setOtpStatusType('error');
+      }
     } catch (err) {
       setOtpStatus(isBn ? 'নেটওয়ার্ক ত্রুটি' : 'Network error sending OTP');
+      setOtpStatusType('error');
+    } finally {
+      setSendingOtp(false);
     }
   };
 
   const verifyOtp = async () => {
+    if (!otp || otp.length < 4) {
+      setOtpStatus(isBn ? 'সঠিক OTP লিখুন' : 'Please enter a valid OTP');
+      setOtpStatusType('error');
+      return;
+    }
     setOtpStatus('');
+    setOtpStatusType('');
+    setVerifyingOtp(true);
     try {
       const { ok, data } = await api.post('/user/verify-otp', { email: user?.email, otp });
       if (ok && data?.resetToken) {
         setResetToken(data.resetToken);
         setOtpStatus(isBn ? 'OTP যাচাই হয়েছে — নতুন পাসওয়ার্ড দিন' : 'OTP verified — enter your new password');
-      } else setOtpStatus(data?.message || (isBn ? 'ভুল OTP' : 'Invalid OTP'));
+        setOtpStatusType('success');
+      } else {
+        setOtpStatus(data?.message || (isBn ? 'ভুল OTP' : 'Invalid OTP'));
+        setOtpStatusType('error');
+      }
     } catch (err) {
       setOtpStatus(isBn ? 'নেটওয়ার্ক ত্রুটি' : 'Network error verifying OTP');
+      setOtpStatusType('error');
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
   const submitNewPassword = async () => {
-    if (!resetToken) return setOtpStatus(isBn ? 'প্রথমে OTP যাচাই করুন' : 'Verify OTP first');
-    if (!newPassword || newPassword.length < 6) return setOtpStatus(isBn ? 'পাসওয়ার্ড খুব ছোট' : 'Password too short');
-    if (newPassword !== confirmPassword) return setOtpStatus(isBn ? 'পাসওয়ার্ড মিলছে না' : 'Passwords do not match');
+    if (!resetToken) {
+      setOtpStatus(isBn ? 'প্রথমে OTP যাচাই করুন' : 'Verify OTP first');
+      setOtpStatusType('error');
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setOtpStatus(isBn ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে' : 'Password must be at least 6 characters');
+      setOtpStatusType('error');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setOtpStatus(isBn ? 'পাসওয়ার্ড মিলছে না' : 'Passwords do not match');
+      setOtpStatusType('error');
+      return;
+    }
 
+    setSettingPassword(true);
     try {
       const { ok, data } = await api.post('/user/reset-password', { resetToken, newPassword });
       if (ok) {
-        setOtpStatus(data?.message || (isBn ? 'পাসওয়ার্ড আপডেট হয়েছে' : 'Password updated'));
+        setOtpStatus(data?.message || (isBn ? 'পাসওয়ার্ড সফলভাবে আপডেট হয়েছে!' : 'Password updated successfully!'));
+        setOtpStatusType('success');
         toast.success(isBn ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে' : 'Password changed successfully');
-        setResetToken(null);
-        setOtp('');
-        setNewPassword('');
-        setConfirmPassword('');
-      } else setOtpStatus(data?.message || (isBn ? 'পাসওয়ার্ড আপডেট ব্যর্থ' : 'Failed to update password'));
+        // Reset all states after success
+        setTimeout(() => {
+          setResetToken(null);
+          setOtp('');
+          setNewPassword('');
+          setConfirmPassword('');
+          setShowPasswordSection(false);
+          setOtpStatus('');
+          setOtpStatusType('');
+        }, 2000);
+      } else {
+        setOtpStatus(data?.message || (isBn ? 'পাসওয়ার্ড আপডেট ব্যর্থ' : 'Failed to update password'));
+        setOtpStatusType('error');
+      }
     } catch (err) {
       setOtpStatus(isBn ? 'নেটওয়ার্ক ত্রুটি' : 'Network error updating password');
+      setOtpStatusType('error');
+    } finally {
+      setSettingPassword(false);
     }
+  };
+
+  const resetPasswordFlow = () => {
+    setOtp('');
+    setResetToken(null);
+    setNewPassword('');
+    setConfirmPassword('');
+    setOtpStatus('');
+    setOtpStatusType('');
+    setShowPasswordSection(false);
   };
 
   // Get display values for location
@@ -392,51 +457,174 @@ const Profile = () => {
               </form>
 
               {status && <p className="text-green-600 font-semibold mt-4">{status}</p>}
-
-              {/* Change Password Section */}
-              <div className="mt-10 p-6 rounded-2xl bg-green-50 border border-green-200">
-                <h2 className="text-xl font-bold text-green-700 flex items-center gap-2 mb-4">
-                  <KeyRound /> {isBn ? 'পাসওয়ার্ড পরিবর্তন' : 'Change Password'}
-                </h2>
-
-                <button onClick={sendOtp} className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors">
-                  {isBn ? 'OTP পাঠান' : 'Send OTP'}
-                </button>
-                {otpStatus && <p className="text-green-700 mt-2 font-medium">{otpStatus}</p>}
-
-                <div className="mt-4">
-                  <label className="text-green-700 font-semibold">{isBn ? 'OTP লিখুন' : 'Enter OTP'}</label>
-                  <input value={otp} onChange={e => setOtp(e.target.value)} className="w-full p-3 mt-1 rounded-xl border border-green-300 bg-white" placeholder="000000" />
-                  <button onClick={verifyOtp} className="mt-2 px-4 py-2 bg-green-700 text-white rounded-lg shadow hover:bg-green-800 transition-colors">
-                    {isBn ? 'OTP যাচাই করুন' : 'Verify OTP'}
-                  </button>
-                </div>
-
-                {resetToken && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="mt-5 space-y-3"
-                  >
-                    <div>
-                      <label className="text-green-700 font-semibold">{isBn ? 'নতুন পাসওয়ার্ড' : 'New Password'}</label>
-                      <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full p-3 rounded-xl border border-green-300 bg-white mt-1" />
-                    </div>
-
-                    <div>
-                      <label className="text-green-700 font-semibold">{isBn ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}</label>
-                      <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full p-3 rounded-xl border border-green-300 bg-white mt-1" />
-                    </div>
-
-                    <button onClick={submitNewPassword} className="px-4 py-2 bg-green-700 text-white rounded-lg shadow hover:bg-green-800 transition-colors">
-                      {isBn ? 'নতুন পাসওয়ার্ড সেট করুন' : 'Set New Password'}
-                    </button>
-                  </motion.div>
-                )}
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Change Password Section - Always visible */}
+        <div className="mt-8 border-t border-green-200 pt-6">
+          {!showPasswordSection ? (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowPasswordSection(true)}
+              className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl text-amber-700 font-semibold hover:from-amber-100 hover:to-orange-100 transition-colors"
+            >
+              <KeyRound size={20} />
+              {isBn ? 'পাসওয়ার্ড পরিবর্তন করুন' : 'Change Password'}
+            </motion.button>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-amber-800 flex items-center gap-2">
+                  <KeyRound size={22} /> {isBn ? 'পাসওয়ার্ড পরিবর্তন' : 'Change Password'}
+                </h2>
+                <button 
+                  onClick={resetPasswordFlow}
+                  className="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Step Indicator */}
+              <div className="flex items-center gap-2 mb-6">
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${!resetToken ? 'bg-amber-600 text-white' : 'bg-green-100 text-green-700'}`}>
+                  <Send size={14} />
+                  {isBn ? '১. OTP পান' : '1. Get OTP'}
+                  {resetToken && <CheckCircle size={14} />}
+                </div>
+                <div className="w-6 h-0.5 bg-amber-200"></div>
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${resetToken ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                  <Lock size={14} />
+                  {isBn ? '২. নতুন পাসওয়ার্ড' : '2. New Password'}
+                </div>
+              </div>
+
+              {/* Status Message */}
+              {otpStatus && (
+                <div className={`mb-4 p-3 rounded-xl text-sm font-medium flex items-center gap-2 ${
+                  otpStatusType === 'success' ? 'bg-green-100 text-green-700 border border-green-200' :
+                  otpStatusType === 'error' ? 'bg-red-100 text-red-700 border border-red-200' :
+                  'bg-blue-100 text-blue-700 border border-blue-200'
+                }`}>
+                  {otpStatusType === 'success' ? <CheckCircle size={16} /> : 
+                   otpStatusType === 'error' ? <X size={16} /> : 
+                   <ShieldCheck size={16} />}
+                  {otpStatus}
+                </div>
+              )}
+
+              {!resetToken ? (
+                /* Step 1: Request & Verify OTP */
+                <div className="space-y-4">
+                  <p className="text-sm text-amber-700">
+                    {isBn 
+                      ? `আমরা আপনার ইমেইলে (${user?.email}) একটি OTP পাঠাব।` 
+                      : `We'll send an OTP to your email (${user?.email}).`}
+                  </p>
+                  
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={sendOtp}
+                      disabled={sendingOtp}
+                      className="flex items-center gap-2 px-4 py-2.5 bg-amber-600 text-white rounded-xl font-medium shadow hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send size={16} />
+                      {sendingOtp ? (isBn ? 'পাঠানো হচ্ছে...' : 'Sending...') : (isBn ? 'OTP পাঠান' : 'Send OTP')}
+                    </button>
+                  </div>
+
+                  <div className="pt-3 border-t border-amber-200">
+                    <label className="text-amber-800 font-semibold text-sm">{isBn ? 'OTP কোড লিখুন' : 'Enter OTP Code'}</label>
+                    <div className="flex gap-3 mt-2">
+                      <input 
+                        value={otp} 
+                        onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} 
+                        className="flex-1 p-3 rounded-xl border border-amber-300 bg-white text-center text-lg font-mono tracking-widest focus:ring-2 focus:ring-amber-400 focus:border-amber-400" 
+                        placeholder="• • • • • •"
+                        maxLength={6}
+                      />
+                      <button 
+                        onClick={verifyOtp}
+                        disabled={verifyingOtp || !otp}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl font-medium shadow hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <ShieldCheck size={16} />
+                        {verifyingOtp ? (isBn ? 'যাচাই হচ্ছে...' : 'Verifying...') : (isBn ? 'যাচাই করুন' : 'Verify')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Step 2: Set New Password */
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="space-y-4"
+                >
+                  <div className="flex items-center gap-2 p-3 bg-green-100 text-green-700 rounded-xl text-sm">
+                    <CheckCircle size={18} />
+                    {isBn ? 'OTP যাচাই সফল! এখন নতুন পাসওয়ার্ড সেট করুন।' : 'OTP verified! Now set your new password.'}
+                  </div>
+
+                  <div>
+                    <label className="text-amber-800 font-semibold text-sm flex items-center gap-2">
+                      <Lock size={16} />
+                      {isBn ? 'নতুন পাসওয়ার্ড' : 'New Password'}
+                    </label>
+                    <input 
+                      type="password" 
+                      value={newPassword} 
+                      onChange={e => setNewPassword(e.target.value)} 
+                      className="w-full p-3 rounded-xl border border-amber-300 bg-white mt-1 focus:ring-2 focus:ring-amber-400 focus:border-amber-400" 
+                      placeholder={isBn ? 'কমপক্ষে ৬ অক্ষর' : 'At least 6 characters'}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-amber-800 font-semibold text-sm flex items-center gap-2">
+                      <ShieldCheck size={16} />
+                      {isBn ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}
+                    </label>
+                    <input 
+                      type="password" 
+                      value={confirmPassword} 
+                      onChange={e => setConfirmPassword(e.target.value)} 
+                      className="w-full p-3 rounded-xl border border-amber-300 bg-white mt-1 focus:ring-2 focus:ring-amber-400 focus:border-amber-400" 
+                      placeholder={isBn ? 'আবার পাসওয়ার্ড লিখুন' : 'Re-enter password'}
+                    />
+                    {confirmPassword && newPassword !== confirmPassword && (
+                      <p className="text-red-500 text-xs mt-1">{isBn ? 'পাসওয়ার্ড মিলছে না' : 'Passwords do not match'}</p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button 
+                      onClick={submitNewPassword}
+                      disabled={settingPassword || !newPassword || newPassword !== confirmPassword}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-xl font-bold shadow hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <KeyRound size={18} />
+                      {settingPassword ? (isBn ? 'সেট করা হচ্ছে...' : 'Setting...') : (isBn ? 'পাসওয়ার্ড সেট করুন' : 'Set Password')}
+                    </button>
+                    <button 
+                      onClick={resetPasswordFlow}
+                      className="px-4 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors"
+                    >
+                      {isBn ? 'বাতিল' : 'Cancel'}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </div>
       </motion.div>
     </motion.div>
   );
