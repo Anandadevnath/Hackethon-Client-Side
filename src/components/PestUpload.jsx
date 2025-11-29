@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 
-const API_URL = "http://localhost:8000"; // backend URL
+const API_URL = "https://hackethon-server-side-1.onrender.com"; // backend URL
 
 export default function PestUpload({ division = null, district = null }) {
   const fileInputRef = useRef(null);

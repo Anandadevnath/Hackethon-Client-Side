@@ -165,8 +165,6 @@ className="flex flex-col md justify-between md gap-4 mb-6"
 
 {t.subtitle}
 
-
-
       {/* LANGUAGE SWITCH */}
       <div className="flex bg-slate-100 border border-slate-300 rounded-full overflow-hidden">
         {["bn", "en"].map((lng) => (
