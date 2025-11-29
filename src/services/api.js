@@ -2,7 +2,7 @@ let API_BASE = '';
 if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
   API_BASE = import.meta.env.VITE_API_BASE;
 } else if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-  API_BASE = 'http://localhost:8000';
+  API_BASE = 'https://hackethon-server-side-production.up.railway.app';
 } else {
   API_BASE = '';
 }
