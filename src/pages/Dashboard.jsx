@@ -2,12 +2,85 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { CloudSun, AlertTriangle, Info, Plus, Eye } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from '../services/api';
 import BanglaVoice from '../components/BanglaVoice';
 import { CROP_TYPES, STORAGE_TYPES, DIVISIONS, DISTRICTS_BY_DIVISION } from '../data/formOptions';
+
+// Translations
+const t = {
+  en: {
+    welcome: "Welcome Back",
+    addCrop: "Add New Crop Batch",
+    viewWarnings: "View Warnings",
+    scanCrop: "Scan Crop (AI)",
+    weatherHighlight: "Weather Highlight",
+    temperature: "Temperature",
+    humidity: "Humidity",
+    rainfall: "Rainfall",
+    forecast: "5-Day Forecast",
+    yourCrops: "Your Crop Batches",
+    viewAll: "View All",
+    loading: "Loading...",
+    noCrops: "No crop batches yet. Add one to get started.",
+    riskAlerts: "Risk Alerts",
+    tipsToday: "Tips for Today",
+    edit: "Edit",
+    delete: "Delete",
+    cancel: "Cancel",
+    save: "Save Crop",
+    saving: "Saving...",
+    update: "Update Crop",
+    updating: "Updating...",
+    editCrop: "Edit Crop Batch",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    confirmDelete: "Are you sure you want to delete this crop batch?",
+    alertHumidity: "High humidity detected - improve ventilation",
+    alertRain: "Rain forecasted in 2 days",
+    tipMoisture: "Check moisture levels in the morning",
+    tipRain: "Rain expected in 2 days - cover outdoor storage",
+    tipTemp: "Temperature rising - improve ventilation",
+  },
+  bn: {
+    welcome: "স্বাগতম",
+    addCrop: "নতুন ফসল ব্যাচ যোগ করুন",
+    viewWarnings: "সতর্কতা দেখুন",
+    scanCrop: "ফসল স্ক্যান (AI)",
+    weatherHighlight: "আবহাওয়া হাইলাইট",
+    temperature: "তাপমাত্রা",
+    humidity: "আর্দ্রতা",
+    rainfall: "বৃষ্টিপাত",
+    forecast: "৫ দিনের পূর্বাভাস",
+    yourCrops: "আপনার ফসল ব্যাচ",
+    viewAll: "সব দেখুন",
+    loading: "লোড হচ্ছে...",
+    noCrops: "এখনো কোনো ফসল ব্যাচ নেই। শুরু করতে একটি যোগ করুন।",
+    riskAlerts: "ঝুঁকি সতর্কতা",
+    tipsToday: "আজকের টিপস",
+    edit: "সম্পাদনা",
+    delete: "মুছুন",
+    cancel: "বাতিল",
+    save: "ফসল সংরক্ষণ",
+    saving: "সংরক্ষণ হচ্ছে...",
+    update: "ফসল আপডেট",
+    updating: "আপডেট হচ্ছে...",
+    editCrop: "ফসল ব্যাচ সম্পাদনা",
+    high: "উচ্চ",
+    medium: "মাঝারি",
+    low: "নিম্ন",
+    confirmDelete: "আপনি কি নিশ্চিত এই ফসল ব্যাচটি মুছতে চান?",
+    alertHumidity: "উচ্চ আর্দ্রতা সনাক্ত - বায়ুচলাচল উন্নত করুন",
+    alertRain: "২ দিনের মধ্যে বৃষ্টির পূর্বাভাস",
+    tipMoisture: "সকালে আর্দ্রতার মাত্রা পরীক্ষা করুন",
+    tipRain: "২ দিনের মধ্যে বৃষ্টি প্রত্যাশিত - বাইরের সংরক্ষণ ঢেকে রাখুন",
+    tipTemp: "তাপমাত্রা বাড়ছে - বায়ুচলাচল উন্নত করুন",
+  }
+};
 
 const motionContainer = {
   hidden: { opacity: 0, y: 12 },
@@ -20,6 +93,8 @@ const fadeUp = {
 
 export default function Dashboard() {
   const { user, setMessage } = useAuth();
+  const { lang } = useLanguage();
+  const txt = t[lang] || t.en;
   const [crops, setCrops] = useState([]);
   const [loadingCrops, setLoadingCrops] = useState(true);
   const navigate = useNavigate();
@@ -41,15 +116,16 @@ export default function Dashboard() {
   const [alerts, setAlerts] = useState([
     {
       id: 1,
-      text: "High humidity detected - improve ventilation",
+      textEn: "High humidity detected - improve ventilation",
+      textBn: "উচ্চ আর্দ্রতা সনাক্ত - বায়ুচলাচল উন্নত করুন",
       level: "high",
     },
-    { id: 2, text: "Rain forecasted in 2 days", level: "medium" },
+    { id: 2, textEn: "Rain forecasted in 2 days", textBn: "২ দিনের মধ্যে বৃষ্টির পূর্বাভাস", level: "medium" },
   ]);
   const [tips, setTips] = useState([
-    "Check moisture levels in the morning",
-    "Rain expected in 2 days - cover outdoor storage",
-    "Temperature rising - improve ventilation",
+    { en: "Check moisture levels in the morning", bn: "সকালে আর্দ্রতার মাত্রা পরীক্ষা করুন" },
+    { en: "Rain expected in 2 days - cover outdoor storage", bn: "২ দিনের মধ্যে বৃষ্টি প্রত্যাশিত - বাইরের সংরক্ষণ ঢেকে রাখুন" },
+    { en: "Temperature rising - improve ventilation", bn: "তাপমাত্রা বাড়ছে - বায়ুচলাচল উন্নত করুন" },
   ]);
 
   const [showCreate, setShowCreate] = useState(false);
@@ -433,7 +509,7 @@ export default function Dashboard() {
 
   // Delete crop
   async function deleteCrop(id) {
-    if (!confirm("Are you sure you want to delete this crop batch?")) return;
+    if (!confirm(txt.confirmDelete)) return;
     
     try {
       const token = localStorage.getItem("accessToken");
@@ -459,10 +535,10 @@ export default function Dashboard() {
       {/* Header */}
       <div className="mb-6">
         <div className="text-sm text-green-600">
-          Friday, {new Date().toLocaleDateString()}
+          {new Date().toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-US', { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' })}
         </div>
         <h1 className="text-3xl font-extrabold text-[#0b5f37] mt-2">
-          Welcome Back, {user?.name || "Farmer"} 👋
+          {txt.welcome}, {user?.name || (lang === 'bn' ? "কৃষক" : "Farmer")} 👋
         </h1>
       </div>
 
@@ -482,7 +558,7 @@ export default function Dashboard() {
           <div className="w-9 h-9 rounded-full bg-[#0e6b3d] flex items-center justify-center text-white">
             <Plus size={16} />
           </div>
-          <div className="font-semibold">Add New Crop Batch</div>
+          <div className="font-semibold">{txt.addCrop}</div>
         </motion.button>
 
         <motion.button
@@ -494,7 +570,7 @@ export default function Dashboard() {
           <div className="w-9 h-9 rounded-full bg-[#fff2d8] flex items-center justify-center text-[#b06f00]">
             <AlertTriangle size={16} />
           </div>
-          <div className="font-medium text-[#5a4b00]">View Warnings</div>
+          <div className="font-medium text-[#5a4b00]">{txt.viewWarnings}</div>
         </motion.button>
 
         <motion.button
@@ -506,7 +582,7 @@ export default function Dashboard() {
           <div className="w-9 h-9 rounded-full bg-[#eaf9ef] flex items-center justify-center text-[#0d7a4e]">
             <CloudSun size={16} />
           </div>
-          <div className="font-medium text-[#0d7a4e]">Scan Crop (AI)</div>
+          <div className="font-medium text-[#0d7a4e]">{txt.scanCrop}</div>
         </motion.button>
       </motion.div>
 
@@ -521,7 +597,7 @@ export default function Dashboard() {
           >
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-xl font-bold">Weather Highlight</h2>
+                <h2 className="text-xl font-bold">{txt.weatherHighlight}</h2>
                 <div className="text-sm mt-1 opacity-90">
                   {weather.location}
                 </div>
@@ -534,20 +610,20 @@ export default function Dashboard() {
             <div className="grid grid-cols-3 gap-4 mt-6">
               <div className="bg-white/8 rounded-xl p-4">
                 <div className="text-2xl font-bold">{weather.temp}</div>
-                <div className="text-xs opacity-90 mt-1">Temperature</div>
+                <div className="text-xs opacity-90 mt-1">{txt.temperature}</div>
               </div>
               <div className="bg-white/8 rounded-xl p-4">
                 <div className="text-2xl font-bold">{weather.humidity}</div>
-                <div className="text-xs opacity-90 mt-1">Humidity</div>
+                <div className="text-xs opacity-90 mt-1">{txt.humidity}</div>
               </div>
               <div className="bg-white/8 rounded-xl p-4">
                 <div className="text-2xl font-bold">{weather.rainfall}</div>
-                <div className="text-xs opacity-90 mt-1">Rainfall</div>
+                <div className="text-xs opacity-90 mt-1">{txt.rainfall}</div>
               </div>
             </div>
 
             <a className="mt-4 inline-block text-sm underline text-white/90">
-              5-Day Forecast →
+              {txt.forecast} →
             </a>
           </motion.div>
 
@@ -560,19 +636,19 @@ export default function Dashboard() {
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-[#0b5f37]">
-                Your Crop Batches
+                {txt.yourCrops}
               </h3>
               <a className="text-sm text-green-600 flex items-center gap-2">
-                <Eye size={14} /> View All
+                <Eye size={14} /> {txt.viewAll}
               </a>
             </div>
 
             <div className="space-y-3">
               {loadingCrops ? (
-                <div className="text-sm text-gray-500">Loading...</div>
+                <div className="text-sm text-gray-500">{txt.loading}</div>
               ) : crops.length === 0 ? (
                 <div className="text-sm text-gray-600">
-                  No crop batches yet. Add one to get started.
+                  {txt.noCrops}
                 </div>
               ) : (
                 crops.map((c, i) => {
@@ -635,14 +711,14 @@ export default function Dashboard() {
                       {/* RIGHT SIDE → Risk badge + Edit/Delete buttons */}
                       <div className="flex items-center gap-3">
                         {/* Risk Badge */}
-                        <RiskBadge level={risk} />
+                        <RiskBadge level={risk} lang={lang} />
 
                         {/* Edit Button */}
                         <button
                           className="text-blue-600 text-xs font-medium hover:underline"
                           onClick={() => openEditModal(c)}
                         >
-                          Edit
+                          {txt.edit}
                         </button>
 
                         {/* Delete Button */}
@@ -650,7 +726,7 @@ export default function Dashboard() {
                           className="text-red-600 text-xs font-medium hover:underline"
                           onClick={() => deleteCrop(id)}
                         >
-                          Delete
+                          {txt.delete}
                         </button>
                       </div>
                     </motion.div>
@@ -673,7 +749,7 @@ export default function Dashboard() {
               <div className="w-9 h-9 rounded-full bg-[#fff3f3] flex items-center justify-center text-red-600">
                 <AlertTriangle />
               </div>
-              <h4 className="font-semibold text-[#0b5f37]">Risk Alerts</h4>
+              <h4 className="font-semibold text-[#0b5f37]">{txt.riskAlerts}</h4>
             </div>
 
             <div className="space-y-3">
@@ -686,7 +762,7 @@ export default function Dashboard() {
                       : "bg-yellow-50 border-l-4 border-yellow-300 text-yellow-700"
                   }`}
                 >
-                  {a.text}
+                  {lang === 'bn' ? a.textBn : a.textEn}
                 </div>
               ))}
             </div>
@@ -702,12 +778,12 @@ export default function Dashboard() {
               <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white">
                 <Info />
               </div>
-              <h4 className="font-semibold">Tips for Today</h4>
+              <h4 className="font-semibold">{txt.tipsToday}</h4>
             </div>
 
             <ul className="list-disc ml-5 mt-2 space-y-2 text-sm">
-              {tips.map((t, idx) => (
-                <li key={idx}>{t}</li>
+              {tips.map((tip, idx) => (
+                <li key={idx}>{lang === 'bn' ? tip.bn : tip.en}</li>
               ))}
             </ul>
           </motion.div>
@@ -746,7 +822,7 @@ export default function Dashboard() {
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-[#0b5f37]">
-                  Add New Crop Batch
+                  {txt.addCrop}
                 </h3>
                 <button
                   onClick={() => setShowCreate(false)}
@@ -899,14 +975,14 @@ export default function Dashboard() {
                     onClick={() => setShowCreate(false)}
                     className="px-4 py-2 rounded border"
                   >
-                    Cancel
+                    {txt.cancel}
                   </button>
                   <button
                     type="submit"
                     disabled={creating}
                     className="px-4 py-2 rounded bg-[#0f7a48] text-white"
                   >
-                    {creating ? "Saving..." : "Save Crop"}
+                    {creating ? txt.saving : txt.save}
                   </button>
                 </div>
               </form>
@@ -932,7 +1008,7 @@ export default function Dashboard() {
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-[#0b5f37]">
-                  Edit Crop Batch
+                  {txt.editCrop}
                 </h3>
                 <button
                   onClick={() => setShowEdit(false)}
@@ -1085,14 +1161,14 @@ export default function Dashboard() {
                     onClick={() => setShowEdit(false)}
                     className="px-4 py-2 rounded border"
                   >
-                    Cancel
+                    {txt.cancel}
                   </button>
                   <button
                     type="submit"
                     disabled={editing}
                     className="px-4 py-2 rounded bg-[#0f7a48] text-white"
                   >
-                    {editing ? "Updating..." : "Update Crop"}
+                    {editing ? txt.updating : txt.update}
                   </button>
                 </div>
               </form>
@@ -1105,23 +1181,30 @@ export default function Dashboard() {
 }
 
 /* Small inline helper component used above */
-function RiskBadge({ level }) {
+function RiskBadge({ level, lang }) {
   const lvl = (level || "low").toString().toLowerCase();
+  const labels = {
+    high: { en: "High", bn: "উচ্চ" },
+    medium: { en: "Medium", bn: "মাঝারি" },
+    low: { en: "Low", bn: "নিম্ন" },
+  };
+  const label = labels[lvl] || labels.low;
+  
   if (lvl === "high")
     return (
       <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 text-sm font-semibold">
-        High
+        {lang === 'bn' ? label.bn : label.en}
       </span>
     );
   if (lvl === "medium")
     return (
       <span className="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-sm font-semibold">
-        Medium
+        {lang === 'bn' ? label.bn : label.en}
       </span>
     );
   return (
     <span className="px-3 py-1 rounded-full bg-green-50 text-green-800 text-sm font-semibold">
-      Low
+      {lang === 'bn' ? label.bn : label.en}
     </span>
   );
 }

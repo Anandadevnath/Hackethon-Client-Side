@@ -53,7 +53,7 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-4">
           <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
             <Globe className={`w-5 h-5 transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#67e794]'}`} />
-            <span className={`font-semibold transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#67e794]'}`}>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
+            <span className={`font-semibold transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#67e794]'}`}>{lang === 'en' ? 'বাংলা' : 'ইংরেজি'}</span>
           </button>
 
           <Link to="/about" className={`text-base font-semibold no-underline px-2 py-1 rounded transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a] hover:bg-black/5' : 'text-[#73ffa4] hover:bg-white/5'}`}>{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
@@ -105,7 +105,7 @@ const Navbar = () => {
               <span className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white shadow-md">
                 <Globe className="w-4 h-4" />
               </span>
-              <span className="font-semibold">{lang === 'en' ? 'বাংলা' : 'English'}</span>
+              <span className="font-semibold">{lang === 'en' ? 'বাংলা' : 'ইংরেজি'}</span>
             </button>
 
             {/* Divider */}
