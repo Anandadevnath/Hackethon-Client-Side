@@ -1,4 +1,14 @@
-const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) || 'http://localhost:8000';
+// Prefer an explicit VITE_API_BASE when provided. During local development
+// (localhost) prefer the local backend at port 8000 so the browser doesn't
+// call a deployed production host (which may block CORS for localhost).
+let API_BASE = '';
+if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
+  API_BASE = import.meta.env.VITE_API_BASE;
+} else if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+  API_BASE = 'http://localhost:8000';
+} else {
+  API_BASE = '';
+}
 
 async function request(path, { method = 'GET', headers = {}, body, params, credentials = true, ...opts } = {}) {
   const p = path && path.startsWith('/') ? path : `/${path || ''}`;

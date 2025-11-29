@@ -76,16 +76,25 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return { ok: true };
       }
-      if (status === 401) {
+      // If server responded with 401, or any non-ok, clear local session anyway
+      // This ensures the user is logged out locally even if remote logout failed
+      if (status === 401 || status === 0 || !ok) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         setUser(null);
+        setMessage(status === 401 ? 'Logged out (token invalid)' : 'Logged out locally');
+        setLoading(false);
+        return { ok: false };
       }
       setMessage('Logout failed');
       setLoading(false);
       return { ok: false };
     } catch (err) {
-      setMessage('Logout error');
+      // Network/CORS error — clear local session so UI reflects logged out state
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      setUser(null);
+      setMessage('Logged out locally (network error)');
       setLoading(false);
       return { ok: false, error: err };
     }
