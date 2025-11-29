@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useLanguage } from "../context/LanguageContext";
 import { motion } from "framer-motion";
 
@@ -19,6 +19,85 @@ const float = {
 export default function CrisisSection() {
   const { lang } = useLanguage();
   const isBn = lang === "bn";
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    // Wait for Leaflet to be loaded via CDN (global `L`)
+    const L = window.L;
+    if (!L) return;
+
+    // Mock: Farmer's registered district center (Dhaka) - replace with real data if available
+    const center = { lat: 23.8103, lng: 90.4125 };
+
+    // initialize map
+    const map = L.map('local-risk-map', { zoomControl: true, touchZoom: true }).setView([center.lat, center.lng], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Utility: Bangla numerals conversion
+    const toBanglaDigits = (num) => String(num).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+
+    // Risk mapping
+    const riskLevels = ['Low', 'Medium', 'High'];
+    const riskBn = { Low: 'নিম্ন', Medium: 'মধ্যম', High: 'উচ্চ' };
+    const riskColor = { Low: '#22c55e', Medium: '#f59e0b', High: '#ef4444' };
+
+    // Crop types in Bangla
+    const cropsBn = ['ধান', 'গম', 'সবজি', 'আখ', 'ফল'];
+
+    // Generate mock neighbor points within district (random offsets)
+    const generateMockPoints = (count = 12) => {
+      const points = [];
+      for (let i = 0; i < count; i++) {
+        // random offset within ~0.04 degrees (~4-5km)
+        const lat = center.lat + (Math.random() - 0.5) * 0.08;
+        const lng = center.lng + (Math.random() - 0.5) * 0.08;
+        const risk = riskLevels[Math.floor(Math.random() * riskLevels.length)];
+        const crop = cropsBn[Math.floor(Math.random() * cropsBn.length)];
+        const hoursAgo = Math.floor(Math.random() * 72); // up to 3 days
+        points.push({ lat, lng, risk, crop, hoursAgo });
+      }
+      return points;
+    };
+
+    const neighbors = generateMockPoints(Math.floor(10 + Math.random() * 6));
+
+    // Farmer's own (mocked) location -- slightly offset to not overlap
+    const farmer = { lat: center.lat + 0.002, lng: center.lng - 0.002 };
+
+    // Farmer marker (distinct blue)
+    const farmerMarker = L.circleMarker([farmer.lat, farmer.lng], {
+      radius: 9,
+      color: '#2563eb',
+      fillColor: '#2563eb',
+      fillOpacity: 0.95,
+      weight: 2
+    }).addTo(map).bindPopup(isBn ? '<b>আপনি</b><br/>ফসল: পর্যালোচনা করুন' : '<b>You</b>');
+
+    // Add anonymous neighbor markers
+    neighbors.forEach(n => {
+      const circle = L.circleMarker([n.lat, n.lng], {
+        radius: 8,
+        color: riskColor[n.risk],
+        fillColor: riskColor[n.risk],
+        fillOpacity: 0.9,
+        weight: 1
+      }).addTo(map);
+
+      const hoursBn = toBanglaDigits(n.hoursAgo);
+      const popupHtml = `ফসল : ${n.crop}<br/>ঝুঁকি : ${riskBn[n.risk]}<br/>শেষ আপডেট : ${hoursBn} ঘন্টা আগে`;
+      circle.bindPopup(popupHtml);
+    });
+
+    mapRef.current = map;
+
+    // Cleanup
+    return () => {
+      try { map.remove(); } catch (e) { }
+    };
+  }, [isBn]);
 
   return (
     <section
@@ -162,6 +241,13 @@ export default function CrisisSection() {
             : "These losses directly affect farmers’ income, household stability, and the environment—pushing national food security at risk."}
         </p>
       </motion.div>
+
+      {/* Local Risk Map */}
+      <div className="max-w-[1220px] mx-auto mt-10 px-3">
+        <h3 className="text-2xl font-bold text-[#6e0d0d] mb-4">{isBn ? 'স্থানীয় ঝুঁকি মানচিত্র' : 'Local Risk Map'}</h3>
+        <div id="local-risk-map" style={{ width: '100%', height: '420px', borderRadius: '12px', overflow: 'hidden' }} />
+        <div className="mt-3 text-sm text-[#546168]">{isBn ? 'নীল পিন: আপনার অবস্থান — অন্যান্য পয়েন্টগুলো সম্পূর্ণ স্বনামের থাকছে।' : 'Blue pin: your location — neighbors shown anonymously.'}</div>
+      </div>
     </section>
   );
 }
