@@ -14,11 +14,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const { ok, data } = await api.post('/user/register', payload, { headers: { 'Content-Type': 'application/json' } });
       if (ok) {
-        if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);
-        if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+        // Do not auto-login after registration. Redirect user to login page instead.
+        // Some backends return tokens on register; we intentionally ignore them here
+        // so the user must explicitly login.
         setMessage(data?.message || 'Registered successfully');
-        if (data?.data) setUser(data.data);
-        if (data?.user) setUser(data.user);
         setLoading(false);
         return { ok: true, data };
       }
@@ -71,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       if (ok) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('selectedUpazila');
         setUser(null);
         setMessage('Logged out successfully');
         setLoading(false);
@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }) => {
       if (status === 401 || status === 0 || !ok) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('selectedUpazila');
         setUser(null);
         setMessage(status === 401 ? 'Logged out (token invalid)' : 'Logged out locally');
         setLoading(false);
@@ -93,6 +94,7 @@ export const AuthProvider = ({ children }) => {
       // Network/CORS error — clear local session so UI reflects logged out state
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('selectedUpazila');
       setUser(null);
       setMessage('Logged out locally (network error)');
       setLoading(false);
