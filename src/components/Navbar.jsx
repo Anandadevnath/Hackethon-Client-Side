@@ -4,6 +4,7 @@ import logoBn from "../assets/harvest-bn-removebg-preview.png";
 import { useLanguage } from "../context/LanguageContext";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Globe, Info, LayoutGrid, User, LogOut, Menu, X, Sparkles } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -51,7 +52,7 @@ const Navbar = () => {
           </div>
         <div className="hidden md:flex items-center gap-4">
           <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
-            <span role="img" aria-label="language" className="text-[1.1em]">🌐</span>
+            <Globe className={`w-5 h-5 transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#67e794]'}`} />
             <span className={`font-semibold transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#67e794]'}`}>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
           </button>
 
@@ -87,33 +88,74 @@ const Navbar = () => {
         <div className="flex items-center md:hidden">
           <button onClick={() => setMobileOpen(v => !v)} aria-label="Toggle menu" className={`p-2 rounded-md backdrop-blur-sm ${scrolled ? 'bg-[#0b6b3a]/10' : 'bg-white/10'}`}>
             {mobileOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${scrolled ? 'text-[#0b6b3a]' : 'text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <X className={`h-6 w-6 ${scrolled ? 'text-[#0b6b3a]' : 'text-white'}`} />
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${scrolled ? 'text-[#0b6b3a]' : 'text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              <Menu className={`h-6 w-6 ${scrolled ? 'text-[#0b6b3a]' : 'text-white'}`} />
             )}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu panel */}
-      <div className={`md:hidden px-4 pb-4 transition-max-h duration-300 overflow-hidden ${mobileOpen ? 'max-h-[400px] ease-out' : 'max-h-0'}`}>
-        <div className="flex flex-col gap-3 pt-3">
-          <button onClick={() => { setLang(l => l === 'en' ? 'bn' : 'en'); setMobileOpen(false); }} className={`flex items-center gap-2 text-sm ${scrolled ? 'text-[#0b6b3a]' : 'text-[#fffbe6]'}`}>
-            <span role="img" aria-label="language" className="text-[1.1em]">🌐</span>
-            <span className="font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
-          </button>
+      {/* Mobile menu panel - Glassmorphism */}
+      <div className={`md:hidden transition-all duration-300 overflow-hidden ${mobileOpen ? 'max-h-[450px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="mx-3 mb-4 p-5 rounded-3xl bg-gradient-to-br from-white/70 via-white/60 to-green-50/50 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/40">
+          <div className="flex flex-col gap-2">
+            {/* Language Toggle */}
+            <button onClick={() => { setLang(l => l === 'en' ? 'bn' : 'en'); setMobileOpen(false); }} className="flex items-center gap-3 text-sm text-[#0b6b3a] hover:bg-white/50 p-3 rounded-xl transition-all duration-200">
+              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white shadow-md">
+                <Globe className="w-4 h-4" />
+              </span>
+              <span className="font-semibold">{lang === 'en' ? 'বাংলা' : 'English'}</span>
+            </button>
 
-          <Link to="/about" onClick={() => setMobileOpen(false)} className={`text-base font-semibold no-underline px-2 py-1 rounded ${scrolled ? 'text-[#0b6b3a] hover:bg-black/5' : 'text-[#fffbe6] hover:bg-white/5'}`}>{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
+            {/* Divider */}
+            <div className="h-px bg-gradient-to-r from-transparent via-green-200 to-transparent my-1"></div>
 
-          {user ? (
-            <>
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block bg-[#0b6b3a] text-white px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.15)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
-              <Link to="/profile" onClick={() => setMobileOpen(false)} className={`block px-2 py-2 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#fffbe6]'}`}>{lang === 'en' ? 'Profile' : 'প্রোফাইল'}</Link>
-              <button onClick={() => { handleLogout(); setMobileOpen(false); }} className={`text-left px-2 py-2 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#fffbe6]'}`}>{lang === 'en' ? 'Logout' : 'লগআউট'}</button>
-            </>
-          ) : (
-            <Link to="/login" onClick={() => setMobileOpen(false)} className="block bg-gradient-to-r from-[#9ef96a] to-[#49c74f] text-[#05310d] rounded-[28px] px-4 py-2 font-bold no-underline shadow-[0_10px_30px_rgba(46,125,50,0.18),0_0_0_6px_rgba(73,199,79,0.06)] transition-transform duration-150 hover:-translate-y-1">{lang === 'en' ? 'Join the Movement' : 'যোগ দিন'}</Link>
-          )}
+            <Link to="/about" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-base font-semibold no-underline px-3 py-3 rounded-xl text-[#0b6b3a] hover:bg-white/50 transition-all duration-200">
+              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white shadow-md">
+                <Info className="w-4 h-4" />
+              </span>
+              {lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}
+            </Link>
+
+            {user ? (
+              <>
+                {/* Divider */}
+                <div className="h-px bg-gradient-to-r from-transparent via-green-200 to-transparent my-1"></div>
+                
+                <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 bg-gradient-to-r from-[#0b6b3a] to-[#0d8a4a] text-white px-4 py-3 rounded-xl font-bold no-underline shadow-lg hover:shadow-xl transition-all duration-200">
+                  <span className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+                    <LayoutGrid className="w-5 h-5" />
+                  </span>
+                  {lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}
+                </Link>
+                
+                <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-[#0b6b3a] hover:bg-white/50 transition-all duration-200 font-medium">
+                  <span className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white shadow-md">
+                    <User className="w-4 h-4" />
+                  </span>
+                  {lang === 'en' ? 'Profile' : 'প্রোফাইল'}
+                </Link>
+                
+                <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="flex items-center gap-3 text-left px-3 py-3 rounded-xl text-red-600 hover:bg-red-50/50 transition-all duration-200 font-medium">
+                  <span className="w-9 h-9 rounded-full bg-gradient-to-br from-red-400 to-rose-500 flex items-center justify-center text-white shadow-md">
+                    <LogOut className="w-4 h-4" />
+                  </span>
+                  {lang === 'en' ? 'Logout' : 'লগআউট'}
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Divider */}
+                <div className="h-px bg-gradient-to-r from-transparent via-green-200 to-transparent my-1"></div>
+                
+                <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#9ef96a] to-[#49c74f] text-[#05310d] rounded-xl px-4 py-3 font-bold no-underline shadow-lg hover:shadow-xl transition-all duration-200">
+                  <Sparkles className="w-5 h-5" />
+                  {lang === 'en' ? 'Join the Movement' : 'যোগ দিন'}
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </nav>
