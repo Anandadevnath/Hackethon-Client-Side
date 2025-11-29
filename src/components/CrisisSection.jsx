@@ -1,32 +1,50 @@
+// CrisisSection.jsx - Full production-ready component
+// Dependencies: react, framer-motion, tailwindcss, leaflet (loaded via CDN in index.html), district-centers, AuthContext, LanguageContext
+
 import React, { useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import districtCenters from "../data/district-centers";
 import { useLanguage } from "../context/LanguageContext";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 
-// Fade-Up Variant
-const fadeUp = {
-  hidden: { opacity: 0, y: 25 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+// --- Animation variants ---
+const container = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.08
+    }
+  }
 };
 
-// Float Animation
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
 const float = {
   animate: {
     y: [0, -10, 0],
-    transition: { duration: 2.5, repeat: Infinity, ease: "easeInOut" }
+    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
   }
 };
+
+// Utility: Bangla numerals conversion
+const toBanglaDigits = (num) => String(num).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[d]);
 
 export default function CrisisSection() {
   const { lang } = useLanguage();
   const isBn = lang === "bn";
   const mapRef = useRef(null);
-
   const { user } = useAuth();
+  const controls = useAnimation();
 
   useEffect(() => {
-    // Wait for Leaflet to be loaded via CDN (global `L`)
+    // small entrance flourish
+    controls.start("show");
+
+    // Leaflet is expected to be loaded globally as `L` via CDN
     const L = window.L;
     if (!L) return;
 
@@ -36,232 +54,177 @@ export default function CrisisSection() {
       const loc = user?.location;
       if (loc && (loc.district || loc.division)) {
         const key = loc.district || loc.division;
-        if (districtCenters[key]) {
-          center = districtCenters[key];
-        }
+        if (districtCenters[key]) center = districtCenters[key];
       }
-    } catch (e) { /* ignore and fallback to default */ }
+    } catch (e) { /* ignore and fallback */ }
 
-    // initialize map
-    const map = L.map('local-risk-map', { zoomControl: true, touchZoom: true }).setView([center.lat, center.lng], 12);
+    // initialize map (sensible zoom/controls)
+    const map = L.map('local-risk-map', { zoomControl: true, dragging: true, attributionControl: false }).setView([center.lat, center.lng], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Utility: Bangla numerals conversion
-    const toBanglaDigits = (num) => String(num).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
-
-    // Risk mapping
     const riskLevels = ['Low', 'Medium', 'High'];
     const riskBn = { Low: 'নিম্ন', Medium: 'মধ্যম', High: 'উচ্চ' };
     const riskColor = { Low: '#22c55e', Medium: '#f59e0b', High: '#ef4444' };
-
-    // Crop types in Bangla
     const cropsBn = ['ধান', 'গম', 'সবজি', 'আখ', 'ফল'];
 
-    // Generate mock neighbor points within district (random offsets)
+    // Generate anonymized neighbor points (mock data)
     const generateMockPoints = (count = 12) => {
       const points = [];
       for (let i = 0; i < count; i++) {
-        // random offset within ~0.04 degrees (~4-5km)
         const lat = center.lat + (Math.random() - 0.5) * 0.08;
         const lng = center.lng + (Math.random() - 0.5) * 0.08;
         const risk = riskLevels[Math.floor(Math.random() * riskLevels.length)];
         const crop = cropsBn[Math.floor(Math.random() * cropsBn.length)];
-        const hoursAgo = Math.floor(Math.random() * 72); // up to 3 days
+        const hoursAgo = Math.floor(Math.random() * 72);
         points.push({ lat, lng, risk, crop, hoursAgo });
       }
       return points;
     };
 
-    const neighbors = generateMockPoints(Math.floor(10 + Math.random() * 6));
+    const neighbors = generateMockPoints(Math.floor(10 + Math.random() * 8));
 
-    // Farmer's registered location: if user provided precise lat/lng, use them; otherwise use district center
+    // Farmer marker
     const farmer = (user && user.location && user.location.lat && user.location.lng)
       ? { lat: Number(user.location.lat), lng: Number(user.location.lng) }
       : { lat: center.lat, lng: center.lng };
 
-    // Farmer marker (distinct blue)
     const farmerMarker = L.circleMarker([farmer.lat, farmer.lng], {
-      radius: 9,
+      radius: 10,
       color: '#2563eb',
       fillColor: '#2563eb',
       fillOpacity: 0.95,
       weight: 2
     }).addTo(map).bindPopup(isBn ? '<b>আপনি</b><br/>ফসল: পর্যালোচনা করুন' : '<b>You</b>');
 
-    // Add anonymous neighbor markers
-    neighbors.forEach(n => {
-      const circle = L.circleMarker([n.lat, n.lng], {
-        radius: 8,
+    // add neighbor markers
+    neighbors.forEach((n, idx) => {
+      const el = L.circleMarker([n.lat, n.lng], {
+        radius: 7,
         color: riskColor[n.risk],
         fillColor: riskColor[n.risk],
         fillOpacity: 0.9,
         weight: 1
       }).addTo(map);
 
-      const hoursBn = toBanglaDigits(n.hoursAgo);
-      const popupHtml = `ফসল : ${n.crop}<br/>ঝুঁকি : ${riskBn[n.risk]}<br/>শেষ আপডেট : ${hoursBn} ঘন্টা আগে`;
-      circle.bindPopup(popupHtml);
+      const hoursBn = isBn ? toBanglaDigits(n.hoursAgo) : `${n.hoursAgo}`;
+      const popupHtml = isBn
+        ? `ফসল : ${n.crop}<br/>ঝুঁকি : ${riskBn[n.risk]}<br/>শেষ আপডেট : ${hoursBn} ঘন্টা আগে`
+        : `Crop: ${n.crop}<br/>Risk: ${n.risk}<br/>Updated: ${hoursBn} hrs ago`;
+
+      el.bindPopup(popupHtml);
     });
 
     mapRef.current = map;
 
-    // Cleanup
+    // cleanup
     return () => {
       try { map.remove(); } catch (e) { }
     };
-  }, [isBn]);
+  }, [controls, user, isBn]);
+
+  // Data for stat cards
+  const stats = [
+    { icon: '📉', number: isBn ? '৪.৫M' : '4.5M', labelBn: 'বার্ষিক হারানো টন', labelEn: 'Metric Tonnes Lost Annually' },
+    { icon: '💲', number: isBn ? '$১.৫B' : '$1.5B', labelBn: 'বার্ষিক অর্থনৈতিক ক্ষতি', labelEn: 'Economic Loss Per Year' },
+    { icon: '⚠️', number: isBn ? '৩৮M+' : '38M+', labelBn: 'খাদ্য অনিরাপত্তায় থাকা মানুষ', labelEn: 'People Facing Food Insecurity' }
+  ];
 
   return (
-    <section
-      className="
-      bg-[radial-gradient(circle_at_top,#fff7f4,#ffe8df,#ffd7ca)]
-      py-20 px-5
-    "
-    >
-      <div className="max-w-[1200px] mx-auto grid md:grid-cols-1 gap-12 items-start">
+    <section className="relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#fff7f4] via-[#ffe8df] to-[#ffd7ca] py-24 px-5">
 
-        {/* LEFT / MAIN CONTENT */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          {/* Floating Warning Icon */}
-          <motion.div
-            variants={float}
-            animate="animate"
-            className="
-              w-20 h-20 rounded-2xl
-              bg-[rgba(255,60,60,0.12)]
-              text-[#ff2e2e]
-              flex items-center justify-center
-              text-4xl
-              shadow-[0_20px_40px_rgba(255,80,60,0.15)]
-            "
-          >
-            ⚠️
+      {/* Decorative Gradient Blobs */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute -left-32 -top-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ffd7ca] to-[#fff2f0] opacity-60 blur-3xl transform -rotate-12" />
+        <div className="absolute -right-40 bottom-0 w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-[#fff7f4] to-[#ffe8df] opacity-60 blur-2xl" />
+      </div>
+
+      <div className="max-w-[1200px] mx-auto grid gap-10">
+        <motion.div variants={container} initial="hidden" animate={controls} className="grid gap-6">
+
+          {/* Header */}
+          <motion.div variants={fadeUp} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+            <div className="flex items-start gap-6">
+              <motion.div variants={float} animate="animate" className="w-20 h-20 rounded-3xl bg-[rgba(255,60,60,0.14)] text-[#ff2e2e] flex items-center justify-center text-3xl shadow-[0_18px_35px_rgba(255,80,60,0.18)]">
+                <span aria-hidden>⚠️</span>
+              </motion.div>
+
+              <div>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-[#6e0d0d] leading-tight">
+                  {isBn ? 'আমরা যে সংকটে আছি' : 'The Crisis We Face'}
+                </h2>
+                <p className="mt-3 text-sm md:text-base text-[#5a3b2b] max-w-xl">
+                  {isBn
+                    ? 'বাংলাদেশ প্রতিবছর খাদ্য ব্যবস্থায় কোটি কোটি টাকার ক্ষতির মুখে পড়ে। এটি শুধু পরিসংখ্যান নয়—এটি বাস্তব ক্ষুধা, নষ্ট হওয়া সম্পদ এবং দুঃখজনক সামাজিক প্রভাব।'
+                    : 'Bangladesh loses billions of taka in food every year. This is not just numbers—this is real hunger, wasted resources, and deep social impact.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 items-center">
+              <button className="hidden md:inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-2xl px-4 py-2 shadow hover:scale-105 transition-transform">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 4v8l6 3" stroke="#6e0d0d" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <span className="text-sm text-[#6e0d0d]">{isBn ? 'বিস্তারিত রিপোর্ট' : 'View Report'}</span>
+              </button>
+            </div>
           </motion.div>
 
-          {/* Title */}
-          <h2 className="text-4xl mt-6 mb-4 text-[#6e0d0d] font-extrabold tracking-tight">
-            {isBn ? "আমরা যে সংকটে আছি" : "The Crisis We Face"}
-          </h2>
-
-          {/* Description */}
-          <p className="text-[#7a2626] text-[17px] max-w-[550px] mb-6 leading-relaxed">
-            {isBn
-              ? "বাংলাদেশ প্রতিবছর খাদ্য ব্যবস্থায় কোটি কোটি টাকার ক্ষতির মুখে পড়ে। এটি শুধু পরিসংখ্যান নয়—এটি বাস্তব ক্ষুধা, নষ্ট হওয়া সম্পদ এবং দুঃখজনক সামাজিক প্রভাব।"
-              : "Bangladesh loses billions of taka in food every year. This is not just data—it is real hunger, wasted resources, and serious social impact."}
-          </p>
-
-          {/* Bullet Points */}
-          <ul className="text-[#5a3b2b] space-y-3 leading-relaxed text-[16px]">
+          {/* Bullets */}
+          <motion.ul variants={fadeUp} className="grid md:grid-cols-3 gap-6">
             {isBn ? (
               <>
-                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> ফসল সংগ্রহের পরবর্তী ক্ষতি ধান, গম এবং সবজিতে বেশি</li>
-                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> অপর্যাপ্ত সংরক্ষণ সুবিধা ও দুর্বল অবকাঠামো প্রধান কারণ</li>
-                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> জলবায়ু পরিবর্তনের অস্থিরতা ক্ষতির হার আরও বাড়ায়</li>
+                <li className="flex items-start gap-3 bg-white/80 p-4 rounded-2xl shadow"> <div className="text-red-500 text-2xl">•</div> <div className="text-sm text-[#5a3b2b]">ফসল সংগ্রহের পরবর্তী ক্ষতি ধান, গম এবং সবজিতে বেশি</div></li>
+                <li className="flex items-start gap-3 bg-white/80 p-4 rounded-2xl shadow"> <div className="text-red-500 text-2xl">•</div> <div className="text-sm text-[#5a3b2b]">অপর্যাপ্ত সংরক্ষণ সুবিধা ও দুর্বল অবকাঠামো প্রধান কারণ</div></li>
+                <li className="flex items-start gap-3 bg-white/80 p-4 rounded-2xl shadow"> <div className="text-red-500 text-2xl">•</div> <div className="text-sm text-[#5a3b2b]">জলবায়ু পরিবর্তনের অস্থিরতা ক্ষতির হার আরও বাড়ায়</div></li>
               </>
             ) : (
               <>
-                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> Post-harvest losses severely impact rice, wheat and vegetables</li>
-                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> Poor storage facilities and outdated infrastructure worsen loss</li>
-                <li className="flex gap-2"><span className="text-red-500 text-xl">•</span> Climate volatility increases the risk of spoilage</li>
+                <li className="flex items-start gap-3 bg-white/80 p-4 rounded-2xl shadow"> <div className="text-red-500 text-2xl">•</div> <div className="text-sm text-[#5a3b2b]">Post-harvest losses severely affect rice, wheat and vegetables</div></li>
+                <li className="flex items-start gap-3 bg-white/80 p-4 rounded-2xl shadow"> <div className="text-red-500 text-2xl">•</div> <div className="text-sm text-[#5a3b2b]">Poor storage facilities and weak infrastructure increase spoilage</div></li>
+                <li className="flex items-start gap-3 bg-white/80 p-4 rounded-2xl shadow"> <div className="text-red-500 text-2xl">•</div> <div className="text-sm text-[#5a3b2b]">Climate volatility increases vulnerability</div></li>
               </>
             )}
-          </ul>
-        </motion.div>
-      </div>
+          </motion.ul>
 
-      {/* BOTTOM STAT CARDS */}
-      <div className="max-w-[1220px] mx-auto mt-20 grid md:grid-cols-3 gap-7 px-3">
-
-        {[
-          {
-            icon: "📉",
-            number: isBn ? "৪.৫M" : "4.5M",
-            labelBn: "বার্ষিক হারানো টন",
-            labelEn: "Metric Tonnes Lost Annually"
-          },
-          {
-            icon: "💲",
-            number: isBn ? "$১.৫B" : "$1.5B",
-            labelBn: "বার্ষিক অর্থনৈতিক ক্ষতি",
-            labelEn: "Economic Loss Per Year"
-          },
-          {
-            icon: "⚠️",
-            number: isBn ? "৩৮M+" : "38M+",
-            labelBn: "খাদ্য অনিরাপত্তায় থাকা মানুষ",
-            labelEn: "People Facing Food Insecurity"
-          }
-        ].map((card, i) => (
-          <motion.div
-            key={i}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            whileHover={{ scale: 1.06, transition: { duration: 0.25 } }}
-            className="
-              bg-white rounded-2xl p-7
-              shadow-[0_20px_45px_rgba(0,0,0,0.06)]
-              flex gap-5 items-center
-              transition-all
-            "
-          >
-            {/* Icon */}
-            <div className="
-              w-20 h-20 rounded-xl
-              bg-gradient-to-b from-[#ff8a5b] to-[#ff4c2e]
-              flex items-center justify-center text-3xl text-white shadow-lg
-            ">
-              {card.icon}
-            </div>
-
-            {/* Text */}
-            <div>
-              <div className="text-3xl font-extrabold text-[#2e3338]">
-                {card.number}
-              </div>
-              <div className="text-sm text-[#7a8589]">
-                {isBn ? card.labelBn : card.labelEn}
-              </div>
-            </div>
+          {/* Stats */}
+          <motion.div variants={fadeUp} className="grid md:grid-cols-3 gap-6 mt-4">
+            {stats.map((card, i) => (
+              <motion.div key={i} whileHover={{ y: -6 }} transition={{ type: 'spring', stiffness: 260 }} className="bg-white rounded-3xl p-6 shadow-lg flex items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-b from-[#ff8a5b] to-[#ff4c2e] flex items-center justify-center text-2xl text-white shadow-md">{card.icon}</div>
+                <div>
+                  <div className="text-2xl md:text-3xl font-extrabold text-[#222]">{card.number}</div>
+                  <div className="text-xs md:text-sm text-[#6b7578]">{isBn ? card.labelBn : card.labelEn}</div>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
-        ))}
 
-      </div>
+          {/* Loss effect text */}
+          <motion.div variants={fadeUp} className="mt-6 bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md">
+            <p className="text-center text-[#7a2f2f] text-base md:text-lg">
+              {isBn
+                ? 'এই ক্ষতিগুলো কৃষকের আয়, পরিবারিক জীবন এবং পরিবেশকে সরাসরি প্রভাবিত করে—ফলে জাতীয় খাদ্য নিরাপত্তা হুমকির মুখে পড়ে।'
+                : "These losses directly affect farmers’ income, household stability, and the environment—pushing national food security at risk."}
+            </p>
+          </motion.div>
 
-      {/* LOSS EFFECT TEXT */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="
-          max-w-[900px] mx-auto mt-16
-          bg-white/70 backdrop-blur-xl
-          text-center p-7 rounded-xl
-          shadow-[0_12px_35px_rgba(0,0,0,0.06)]
-        "
-      >
-        <p className="text-[#7a2f2f] leading-relaxed text-[16px]">
-          {isBn
-            ? "এই ক্ষতিগুলো কৃষকের আয়, পরিবারিক জীবন এবং পরিবেশকে সরাসরি প্রভাবিত করে—ফলে জাতীয় খাদ্য নিরাপত্তা হুমকির মুখে পড়ে।"
-            : "These losses directly affect farmers’ income, household stability, and the environment—pushing national food security at risk."}
-        </p>
-      </motion.div>
+          {/* Map Section */}
+          <motion.div variants={fadeUp} className="mt-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-[#6e0d0d]">{isBn ? 'স্থানীয় ঝুঁকি মানচিত্র' : 'Local Risk Map'}</h3>
+              <div className="text-sm text-[#546168]">{isBn ? 'নীল পিন: আপনার অবস্থান — অন্যান্য পয়েন্টগুলো সম্পূর্ণ স্বনামের থাকছে।' : 'Blue pin: your location — neighbors shown anonymously.'}</div>
+            </div>
 
-      {/* Local Risk Map */}
-      <div className="max-w-[1220px] mx-auto mt-10 px-3">
-        <h3 className="text-2xl font-bold text-[#6e0d0d] mb-4">{isBn ? 'স্থানীয় ঝুঁকি মানচিত্র' : 'Local Risk Map'}</h3>
-        <div id="local-risk-map" style={{ width: '100%', height: '420px', borderRadius: '12px', overflow: 'hidden' }} />
-        <div className="mt-3 text-sm text-[#546168]">{isBn ? 'নীল পিন: আপনার অবস্থান — অন্যান্য পয়েন্টগুলো সম্পূর্ণ স্বনামের থাকছে।' : 'Blue pin: your location — neighbors shown anonymously.'}</div>
+            <div className="rounded-3xl overflow-hidden shadow-[0_18px_50px_rgba(0,0,0,0.12)]">
+              <div id="local-risk-map" style={{ width: '100%', height: 480 }} />
+            </div>
+
+          </motion.div>
+
+        </motion.div>
       </div>
     </section>
   );
