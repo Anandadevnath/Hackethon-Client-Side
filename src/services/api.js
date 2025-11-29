@@ -1,6 +1,3 @@
-// Prefer an explicit VITE_API_BASE when provided. During local development
-// (localhost) prefer the local backend at port 8000 so the browser doesn't
-// call a deployed production host (which may block CORS for localhost).
 let API_BASE = '';
 if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
   API_BASE = import.meta.env.VITE_API_BASE;
@@ -21,7 +18,6 @@ async function request(path, { method = 'GET', headers = {}, body, params, crede
   const fetchOpts = { method, headers: { ...headers }, credentials: credentials ? 'include' : 'same-origin', ...opts };
   if (body !== undefined) {
     if (body instanceof FormData) {
-      // let browser set the Content-Type for FormData
       fetchOpts.body = body;
     } else if (typeof body === 'object') {
       fetchOpts.headers = { 'Content-Type': 'application/json', ...fetchOpts.headers };
