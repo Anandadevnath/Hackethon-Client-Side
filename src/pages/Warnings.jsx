@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { generateRiskSummaryFromRow } from "../utils/riskEngine";
+import { generateSmartAlert, simulateSMSNotification } from "../services/smartAlertService";
 
 const STRINGS = {
   bn: {
@@ -368,6 +369,27 @@ export default function Warnings() {
                   color: "#4b5563",
                 }}
               >
+                {/* SMS Notification Badge for Critical */}
+                {r.riskLevel === "Critical" && (
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      backgroundColor: "#dc2626",
+                      color: "white",
+                      padding: "4px 10px",
+                      borderRadius: "999px",
+                      fontSize: "11px",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                      animation: "pulse 2s infinite",
+                    }}
+                  >
+                    📱 SMS {lang === "bn" ? "পাঠানো হয়েছে" : "Sent"} (Console)
+                  </div>
+                )}
+
                 <h3
                   style={{
                     color: riskColor[r.riskLevel] || "#374151",
@@ -376,9 +398,33 @@ export default function Warnings() {
                     fontWeight: "700",
                   }}
                 >
-                  {r.batchId} — {r.riskLevel} Risk
+                  {r.batchId} — {r.riskBn || r.riskLevel} {lang === "bn" ? "ঝুঁকি" : "Risk"}
                 </h3>
-                <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+
+                {/* Smart Bangla Alert Box */}
+                {r.banglaAlert && (
+                  <div
+                    style={{
+                      backgroundColor: r.riskLevel === "Critical" ? "#fef2f2" : 
+                                       r.riskLevel === "High" ? "#fff7ed" :
+                                       r.riskLevel === "Moderate" ? "#fefce8" : "#f0fdf4",
+                      border: `1px solid ${riskColor[r.riskLevel] || "#6b7280"}`,
+                      borderRadius: "12px",
+                      padding: "12px 14px",
+                      marginBottom: "12px",
+                      fontSize: "14px",
+                      lineHeight: "1.6",
+                      color: "#1f2937",
+                    }}
+                  >
+                    <div style={{ fontWeight: "600", marginBottom: "4px", color: riskColor[r.riskLevel] }}>
+                      🤖 {lang === "bn" ? "স্মার্ট পরামর্শ:" : "Smart Advice:"}
+                    </div>
+                    {r.banglaAlert}
+                  </div>
+                )}
+
+                <p style={{ fontSize: "13px", marginBottom: "10px", color: "#6b7280" }}>
                   {r.message}
                 </p>
 

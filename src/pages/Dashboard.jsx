@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from '../services/api';
 import BanglaVoice from '../components/BanglaVoice';
+import { CROP_TYPES, STORAGE_TYPES, DIVISIONS, DISTRICTS_BY_DIVISION } from '../data/formOptions';
 
 const motionContainer = {
   hidden: { opacity: 0, y: 12 },
@@ -63,6 +64,7 @@ export default function Dashboard() {
     notes: "",
   });
   const [errors, setErrors] = useState([]);
+  const [availableDistricts, setAvailableDistricts] = useState([]);
 
   // Load crops
   useEffect(() => {
@@ -231,6 +233,14 @@ export default function Dashboard() {
   function handleFormChange(e) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
+    
+    // Update available districts when division changes
+    if (name === 'storageDivision') {
+      const districts = DISTRICTS_BY_DIVISION[value] || [];
+      setAvailableDistricts(districts);
+      // Reset district selection when division changes
+      setForm((f) => ({ ...f, storageDistrict: '' }));
+    }
   }
 
   // Submit create crop
@@ -606,59 +616,133 @@ export default function Dashboard() {
               )}
 
               <form onSubmit={handleCreate} className="grid grid-cols-2 gap-4">
-                <input
-                  name="cropType"
-                  value={form.cropType}
-                  onChange={handleFormChange}
-                  placeholder="Crop (e.g. Rice)"
-                  className="col-span-2 border p-3 rounded"
-                />
-                <input
-                  name="estimatedWeightKg"
-                  value={form.estimatedWeightKg}
-                  onChange={handleFormChange}
-                  placeholder="Estimated weight (kg)"
-                  className="border p-3 rounded"
-                />
-                <input
-                  name="harvestDate"
-                  value={form.harvestDate}
-                  onChange={handleFormChange}
-                  type="date"
-                  className="border p-3 rounded"
-                />
-                <input
-                  name="storageDivision"
-                  value={form.storageDivision}
-                  onChange={handleFormChange}
-                  placeholder="Storage Division"
-                  className="border p-3 rounded"
-                />
-                <input
-                  name="storageDistrict"
-                  value={form.storageDistrict}
-                  onChange={handleFormChange}
-                  placeholder="Storage District"
-                  className="border p-3 rounded"
-                />
-                <select
-                  name="storageType"
-                  value={form.storageType}
-                  onChange={handleFormChange}
-                  className="border p-3 rounded"
-                >
-                  <option>Silo</option>
-                  <option>Jute Bag Stack</option>
-                  <option>Open Area</option>
-                </select>
+                {/* Crop Type Dropdown */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ফসলের ধরন / Crop Type
+                  </label>
+                  <select
+                    name="cropType"
+                    value={form.cropType}
+                    onChange={handleFormChange}
+                    className="w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value="">-- Select Crop / ফসল নির্বাচন করুন --</option>
+                    {CROP_TYPES.map((crop) => (
+                      <option key={crop.value} value={crop.value}>
+                        {crop.bn} ({crop.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                <textarea
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleFormChange}
-                  placeholder="Notes"
-                  className="col-span-2 border p-3 rounded h-24"
-                ></textarea>
+                {/* Estimated Weight */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    আনুমানিক ওজন (কেজি)
+                  </label>
+                  <input
+                    name="estimatedWeightKg"
+                    value={form.estimatedWeightKg}
+                    onChange={handleFormChange}
+                    placeholder="e.g. 500"
+                    type="number"
+                    min="0"
+                    className="w-full border p-3 rounded focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* Harvest Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ফসল কাটার তারিখ
+                  </label>
+                  <input
+                    name="harvestDate"
+                    value={form.harvestDate}
+                    onChange={handleFormChange}
+                    type="date"
+                    className="w-full border p-3 rounded focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* Division Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    বিভাগ / Division
+                  </label>
+                  <select
+                    name="storageDivision"
+                    value={form.storageDivision}
+                    onChange={handleFormChange}
+                    className="w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">-- বিভাগ নির্বাচন করুন --</option>
+                    {DIVISIONS.map((div) => (
+                      <option key={div.value} value={div.value}>
+                        {div.bn} ({div.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* District Dropdown (depends on Division) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    জেলা / District
+                  </label>
+                  <select
+                    name="storageDistrict"
+                    value={form.storageDistrict}
+                    onChange={handleFormChange}
+                    disabled={!form.storageDivision}
+                    className={`w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500 ${
+                      !form.storageDivision ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <option value="">
+                      {form.storageDivision ? '-- জেলা নির্বাচন করুন --' : '-- প্রথমে বিভাগ নির্বাচন করুন --'}
+                    </option>
+                    {availableDistricts.map((dist) => (
+                      <option key={dist.value} value={dist.value}>
+                        {dist.bn} ({dist.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Storage Type Dropdown */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    সংরক্ষণ পদ্ধতি / Storage Type
+                  </label>
+                  <select
+                    name="storageType"
+                    value={form.storageType}
+                    onChange={handleFormChange}
+                    className="w-full border p-3 rounded bg-white focus:ring-2 focus:ring-green-500"
+                  >
+                    {STORAGE_TYPES.map((storage) => (
+                      <option key={storage.value} value={storage.value}>
+                        {storage.bn} ({storage.en})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Notes */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    নোট / Notes
+                  </label>
+                  <textarea
+                    name="notes"
+                    value={form.notes}
+                    onChange={handleFormChange}
+                    placeholder="অতিরিক্ত তথ্য লিখুন..."
+                    className="w-full border p-3 rounded h-24 focus:ring-2 focus:ring-green-500"
+                  ></textarea>
+                </div>
 
                 <div className="col-span-2 flex justify-end gap-3 mt-2">
                   <button
