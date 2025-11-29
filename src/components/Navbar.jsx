@@ -45,7 +45,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <div className="flex items-center">
               <Link to="/" className="inline-block">
-                <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-14 md:h-[90px] block" />
+                <img src={lang === 'en' ? logoEn : logoBn} alt="HarvestGuard" className="h-12 md:h-16 max-w-[140px] md:max-w-[180px] object-contain block" />
               </Link>
             </div>
           </div>

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
-import logoEn from '../assets/harvest-en-removebg-preview.png';
-import logoBn from '../assets/harvest-bn-removebg-preview.png';
 import heroBg from '../assets/bg.png';
 
 export default function HeroBanner() {
@@ -30,11 +28,7 @@ export default function HeroBanner() {
             show: { transition: { staggerChildren: 0.12 } },
           }}
         >
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className="">
-            <img src={isBn ? logoBn : logoEn} alt="Harvest logo" className="w-64 h-30 rounded-lg object-contain bg-white/0" />
-          </motion.div>
-
-          <motion.h1 className="mt-6 mb-5 font-extrabold text-4xl sm:text-5xl md:text-[48px] lg:text-[56px] leading-[1.03] tracking-[-0.8px] text-white" style={{ textShadow: '0 6px 18px rgba(3,10,6,0.35)' }} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+          <motion.h1 className="mb-5 font-extrabold text-4xl sm:text-5xl md:text-[48px] lg:text-[56px] leading-[1.03] tracking-[-0.8px] text-white" style={{ textShadow: '0 6px 18px rgba(3,10,6,0.35)' }} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             {isBn ? (
               <>
                 আপনার কৃষি যাত্রায়
