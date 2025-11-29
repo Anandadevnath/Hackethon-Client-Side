@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext";
+import districtCenters from "../data/district-centers";
 import { useLanguage } from "../context/LanguageContext";
 import { motion } from "framer-motion";
 
@@ -21,13 +23,24 @@ export default function CrisisSection() {
   const isBn = lang === "bn";
   const mapRef = useRef(null);
 
+  const { user } = useAuth();
+
   useEffect(() => {
     // Wait for Leaflet to be loaded via CDN (global `L`)
     const L = window.L;
     if (!L) return;
 
-    // Mock: Farmer's registered district center (Dhaka) - replace with real data if available
-    const center = { lat: 23.8103, lng: 90.4125 };
+    // Determine map center from user's registered location if available
+    let center = { lat: 23.8103, lng: 90.4125 }; // default Dhaka
+    try {
+      const loc = user?.location;
+      if (loc && (loc.district || loc.division)) {
+        const key = loc.district || loc.division;
+        if (districtCenters[key]) {
+          center = districtCenters[key];
+        }
+      }
+    } catch (e) { /* ignore and fallback to default */ }
 
     // initialize map
     const map = L.map('local-risk-map', { zoomControl: true, touchZoom: true }).setView([center.lat, center.lng], 12);
@@ -64,8 +77,10 @@ export default function CrisisSection() {
 
     const neighbors = generateMockPoints(Math.floor(10 + Math.random() * 6));
 
-    // Farmer's own (mocked) location -- slightly offset to not overlap
-    const farmer = { lat: center.lat + 0.002, lng: center.lng - 0.002 };
+    // Farmer's registered location: if user provided precise lat/lng, use them; otherwise use district center
+    const farmer = (user && user.location && user.location.lat && user.location.lng)
+      ? { lat: Number(user.location.lat), lng: Number(user.location.lng) }
+      : { lat: center.lat, lng: center.lng };
 
     // Farmer marker (distinct blue)
     const farmerMarker = L.circleMarker([farmer.lat, farmer.lng], {
