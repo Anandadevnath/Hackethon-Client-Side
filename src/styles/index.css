@@ -4,3 +4,11 @@
 html, body, #root {
 	overflow-x: hidden;
 }
+
+/* Keep Leaflet map panes behind top UI elements (navbar, modals) */
+.leaflet-container {
+  z-index: 0 !important;
+}
+.leaflet-pane { z-index: 0 !important; }
+.leaflet-tile-pane, .leaflet-overlay-pane, .leaflet-shadow-pane, .leaflet-marker-pane, .leaflet-tooltip-pane { z-index: 0 !important; }
+.leaflet-control-container { z-index: 500 !important; }

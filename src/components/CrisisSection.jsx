@@ -1,13 +1,9 @@
-// CrisisSection.jsx - Full production-ready component
-// Dependencies: react, framer-motion, tailwindcss, leaflet (loaded via CDN in index.html), district-centers, AuthContext, LanguageContext
-
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import districtCenters from "../data/district-centers";
 import { useLanguage } from "../context/LanguageContext";
 import { motion, useAnimation } from "framer-motion";
 
-// --- Animation variants ---
 const container = {
   hidden: {},
   show: {
@@ -30,26 +26,26 @@ const float = {
   }
 };
 
-// Utility: Bangla numerals conversion
 const toBanglaDigits = (num) => String(num).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[d]);
 
 export default function CrisisSection() {
   const { lang } = useLanguage();
   const isBn = lang === "bn";
   const mapRef = useRef(null);
+  const mapContainerRef = useRef(null);
+  const markersRef = useRef([]);
   const { user } = useAuth();
   const controls = useAnimation();
+  const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
-    // small entrance flourish
     controls.start("show");
 
-    // Leaflet is expected to be loaded globally as `L` via CDN
+    // Leaflet
     const L = window.L;
     if (!L) return;
 
-    // Determine map center from user's registered location if available
-    let center = { lat: 23.8103, lng: 90.4125 }; // default Dhaka
+    let center = { lat: 23.8103, lng: 90.4125 }; 
     try {
       const loc = user?.location;
       if (loc && (loc.district || loc.division)) {
@@ -58,7 +54,7 @@ export default function CrisisSection() {
       }
     } catch (e) { /* ignore and fallback */ }
 
-    // initialize map (sensible zoom/controls)
+    // initialize map 
     const map = L.map('local-risk-map', { zoomControl: true, dragging: true, attributionControl: false }).setView([center.lat, center.lng], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -70,7 +66,6 @@ export default function CrisisSection() {
     const riskColor = { Low: '#22c55e', Medium: '#f59e0b', High: '#ef4444' };
     const cropsBn = ['ধান', 'গম', 'সবজি', 'আখ', 'ফল'];
 
-    // Generate anonymized neighbor points (mock data)
     const generateMockPoints = (count = 12) => {
       const points = [];
       for (let i = 0; i < count; i++) {
@@ -86,7 +81,6 @@ export default function CrisisSection() {
 
     const neighbors = generateMockPoints(Math.floor(10 + Math.random() * 8));
 
-    // Farmer marker
     const farmer = (user && user.location && user.location.lat && user.location.lng)
       ? { lat: Number(user.location.lat), lng: Number(user.location.lng) }
       : { lat: center.lat, lng: center.lng };
@@ -98,11 +92,12 @@ export default function CrisisSection() {
       fillOpacity: 0.95,
       weight: 2
     }).addTo(map).bindPopup(isBn ? '<b>আপনি</b><br/>ফসল: পর্যালোচনা করুন' : '<b>You</b>');
+    markersRef.current = [];
+    markersRef.current.push(farmerMarker);
 
-    // add neighbor markers
     neighbors.forEach((n, idx) => {
-      const el = L.circleMarker([n.lat, n.lng], {
-        radius: 7,
+      const marker = L.circleMarker([n.lat, n.lng], {
+        radius: n.risk === 'High' ? 10 : 7,
         color: riskColor[n.risk],
         fillColor: riskColor[n.risk],
         fillOpacity: 0.9,
@@ -114,16 +109,72 @@ export default function CrisisSection() {
         ? `ফসল : ${n.crop}<br/>ঝুঁকি : ${riskBn[n.risk]}<br/>শেষ আপডেট : ${hoursBn} ঘন্টা আগে`
         : `Crop: ${n.crop}<br/>Risk: ${n.risk}<br/>Updated: ${hoursBn} hrs ago`;
 
-      el.bindPopup(popupHtml);
+      marker.bindPopup(popupHtml);
+      markersRef.current.push({ marker, data: n });
     });
+
+    const distanceKm = (a, b) => {
+      const toRad = (v) => (v * Math.PI) / 180;
+      const R = 6371; // km
+      const dLat = toRad(b.lat - a.lat);
+      const dLon = toRad(b.lng - a.lng);
+      const lat1 = toRad(a.lat);
+      const lat2 = toRad(b.lat);
+      const aa = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
+      const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1-aa));
+      return R * c;
+    };
+
+    const nearby = markersRef.current.filter(m => m.data).map(m => ({...m.data, marker: m.marker, distKm: distanceKm(farmer, m.data)}));
+    const dynamicAlerts = nearby.filter(n => (n.risk === 'High' && n.distKm <= 8) || (n.risk === 'Medium' && n.distKm <= 3));
+    dynamicAlerts.sort((a,b) => {
+      const score = { High: 3, Medium: 2, Low: 1 };
+      return (score[b.risk] - score[a.risk]) || (a.distKm - b.distKm);
+    });
+    setAlerts(dynamicAlerts);
 
     mapRef.current = map;
 
-    // cleanup
     return () => {
       try { map.remove(); } catch (e) { }
     };
   }, [controls, user, isBn]);
+
+  const handleViewReport = () => {
+    try {
+      if (mapContainerRef.current && mapContainerRef.current.scrollIntoView) {
+        mapContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      const map = mapRef.current;
+      if (!map) return;
+
+      if (alerts && alerts.length > 0) {
+        const top = alerts[0];
+        if (top.marker) {
+          map.setView([top.lat, top.lng], 14, { animate: true });
+          top.marker.openPopup();
+          return;
+        }
+      }
+      
+      map.setView([map.getCenter().lat, map.getCenter().lng], 12, { animate: true });
+    } catch (e) { /* no-op */ }
+  };
+
+  const handleViewAlert = () => {
+    try {
+      const map = mapRef.current;
+      if (!map) return;
+      if (alerts && alerts.length > 0) {
+        const top = alerts[0];
+        if (top.marker) {
+          map.setView([top.lat, top.lng], 14, { animate: true });
+          top.marker.openPopup();
+        }
+      }
+    } catch (e) { /* no-op */ }
+  };
 
   // Data for stat cards
   const stats = [
@@ -165,7 +216,7 @@ export default function CrisisSection() {
             </div>
 
             <div className="flex gap-3 items-center">
-              <button className="hidden md:inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-2xl px-4 py-2 shadow hover:scale-105 transition-transform">
+              <button onClick={handleViewReport} className="hidden md:inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-2xl px-4 py-2 shadow hover:scale-105 transition-transform">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 4v8l6 3" stroke="#6e0d0d" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 <span className="text-sm text-[#6e0d0d]">{isBn ? 'বিস্তারিত রিপোর্ট' : 'View Report'}</span>
               </button>
@@ -218,7 +269,26 @@ export default function CrisisSection() {
               <div className="text-sm text-[#546168]">{isBn ? 'নীল পিন: আপনার অবস্থান — অন্যান্য পয়েন্টগুলো সম্পূর্ণ স্বনামের থাকছে।' : 'Blue pin: your location — neighbors shown anonymously.'}</div>
             </div>
 
-            <div className="rounded-3xl overflow-hidden shadow-[0_18px_50px_rgba(0,0,0,0.12)]">
+            {/* Dynamic alert banner - depends on computed alerts */}
+            {alerts && alerts.length > 0 ? (
+              <div className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-[#ffe7e5] to-[#ffd2cf] border border-[#ffb7b2] flex items-center justify-between">
+                <div className="text-sm text-[#6e0d0d]">
+                  {isBn ? `সতর্কতা: আপনার কাছাকাছি ${alerts.length}টি ঝুঁকিপূর্ণ পয়েন্ট শনাক্ত হয়েছে। প্রথমটি: ${alerts[0].risk}` : `Alert: ${alerts.length} potentially risky nearby points detected. Top: ${alerts[0].risk}`}
+                </div>
+                <div>
+                  <button onClick={handleViewAlert} className="bg-[#ef4444] text-white px-3 py-2 rounded-lg text-sm shadow">{isBn ? 'দেখুন' : 'View Alert'}</button>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4 p-4 rounded-2xl bg-white/90 border border-[#e6f7ec] flex items-center justify-between">
+                <div className="text-sm text-[#155724]">{isBn ? 'বর্তমানে কোনো আশঙ্কাজনক প্রতিবেশী রিপোর্ট নেই।' : 'No concerning neighbor reports detected near you.'}</div>
+                <div>
+                  <button onClick={handleViewReport} className="bg-[#67c974] text-white px-3 py-2 rounded-lg text-sm shadow">{isBn ? 'মানচিত্র দেখুন' : 'View Map'}</button>
+                </div>
+              </div>
+            )}
+
+            <div ref={mapContainerRef} className="rounded-3xl overflow-hidden shadow-[0_18px_50px_rgba(0,0,0,0.12)]">
               <div id="local-risk-map" style={{ width: '100%', height: 480 }} />
             </div>
 

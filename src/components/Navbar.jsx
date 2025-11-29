@@ -40,7 +40,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-60 box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159, 240, 177, 0.61)_0%,rgba(154, 255, 126, 0.34)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
+    <nav className={`${scrolled ? 'fixed top-0 left-0 right-0' : 'absolute top-4 left-0 right-0'} z-[9999] box-border transition-all duration-200 ${scrolled ? 'bg-[linear-gradient(90deg,rgba(159, 240, 177, 0.61)_0%,rgba(154, 255, 126, 0.34)_100%)] shadow-[0_6px_20px_rgba(6,40,20,0.12)] backdrop-blur-[11px] backdrop-saturate-120' : 'bg-transparent'}`}>
       <div className="max-w-[1400px] mx-auto px-4 py-0 flex items-center justify-between min-h-[72px]">
           <div className="flex items-center">
             <div className="flex items-center">
@@ -72,7 +72,7 @@ const Navbar = () => {
                 <span className="text-[#fffbe6] font-semibold">{user.name || user.email || 'User'}</span>
               </div>
 
-              <div className={`absolute right-0 top-full mt-2 bg-gradient-to-b from-white to-[#fbfff8] text-[#0a4d2c] rounded-[10px] shadow-[0_10px_28px_rgba(6,40,20,0.12)] min-w-[180px] flex flex-col overflow-hidden z-60 transition-all duration-150 ${menuOpen ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-1 invisible pointer-events-none'}`}>
+              <div className={`absolute right-0 top-full mt-2 bg-gradient-to-b from-white to-[#fbfff8] text-[#0a4d2c] rounded-[10px] shadow-[0_10px_28px_rgba(6,40,20,0.12)] min-w-[180px] flex flex-col overflow-hidden z-[10001] transition-all duration-150 ${menuOpen ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-1 invisible pointer-events-none'}`}>
                 <Link to="/dashboard" className="px-4 py-3 text-left no-underline" onClick={() => setMenuOpen(false)}>{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
                 <Link to="/profile" className="px-4 py-3 text-left no-underline" onClick={() => setMenuOpen(false)}>{lang === 'en' ? 'Profile' : 'প্রোফাইল'}</Link>
                 <button className="px-4 py-3 text-left" onClick={handleLogout}>{lang === 'en' ? 'Logout' : 'লগআউট'}</button>
