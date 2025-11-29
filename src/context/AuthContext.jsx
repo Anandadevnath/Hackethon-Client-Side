@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) || 'http://localhost:8000';
+import api from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -13,26 +12,20 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await fetch(`${API_BASE}/user/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
-        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-        setMessage(data.message || 'Registered successfully');
-        if (data.data) setUser(data.data);
-        if (data.user) setUser(data.user);
+      const { ok, data } = await api.post('/user/register', payload, { headers: { 'Content-Type': 'application/json' } });
+      if (ok) {
+        if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);
+        if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+        setMessage(data?.message || 'Registered successfully');
+        if (data?.data) setUser(data.data);
+        if (data?.user) setUser(data.user);
         setLoading(false);
         return { ok: true, data };
       }
       if (data && data.errors && Array.isArray(data.errors)) {
         setMessage(data.errors.join(', '));
       } else {
-        setMessage(data.message || 'Registration failed');
+        setMessage(data?.message || 'Registration failed');
       }
       setLoading(false);
       return { ok: false, data };
@@ -47,22 +40,16 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await fetch(`${API_BASE}/user/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
-        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-        setUser(data.user || data.data || { email: payload.email || payload.username });
-        setMessage(data.message || 'Logged in successfully');
+      const { ok, data } = await api.post('/user/login', payload, { headers: { 'Content-Type': 'application/json' } });
+      if (ok) {
+        if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);
+        if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+        setUser(data?.user || data?.data || { email: payload.email || payload.username });
+        setMessage(data?.message || 'Logged in successfully');
         setLoading(false);
         return { ok: true, data };
       }
-      setMessage(data.message || 'Login failed');
+      setMessage(data?.message || 'Login failed');
       setLoading(false);
       return { ok: false, data };
     } catch (err) {
@@ -80,12 +67,8 @@ export const AuthProvider = ({ children }) => {
       const headers = {};
       if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-      const res = await fetch(`${API_BASE}/user/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers
-      });
-      if (res.ok) {
+      const { ok, status } = await api.post('/user/logout', null, { headers });
+      if (ok) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         setUser(null);
@@ -93,7 +76,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return { ok: true };
       }
-      if (res.status === 401) {
+      if (status === 401) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         setUser(null);
@@ -116,20 +99,14 @@ export const AuthProvider = ({ children }) => {
       const headers = { 'Content-Type': 'application/json' };
       if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-      const res = await fetch(`${API_BASE}/user/update`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify(updates)
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        if (data.data) setUser(data.data);
-        setMessage(data.message || 'Profile updated');
+      const { ok, data } = await api.patch('/user/update', updates, { headers });
+      if (ok) {
+        if (data?.data) setUser(data.data);
+        setMessage(data?.message || 'Profile updated');
         setLoading(false);
         return { ok: true, data };
       }
-      setMessage(data.message || 'Update failed');
+      setMessage(data?.message || 'Update failed');
       setLoading(false);
       return { ok: false, data };
     } catch (err) {
@@ -144,13 +121,8 @@ export const AuthProvider = ({ children }) => {
       const accessToken = localStorage.getItem('accessToken');
       if (!accessToken) return;
       try {
-        const res = await fetch(`${API_BASE}/user/me`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${accessToken}` },
-          credentials: 'include'
-        });
-        const data = await res.json().catch(() => ({}));
-        if (res.ok && data && data.data) {
+        const { ok, data } = await api.get('/user/me', { headers: { Authorization: `Bearer ${accessToken}` } });
+        if (ok && data && data.data) {
           setUser(data.data);
         } else {
           localStorage.removeItem('accessToken');

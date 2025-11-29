@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import api from '../services/api';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -19,17 +20,12 @@ const ResetPassword = () => {
     if (password !== confirm) return setError('Passwords do not match');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/user/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resetToken, newPassword: password }),
-      });
-      const data = await res.json();
-      if (res.ok) {
+      const { ok, data } = await api.post('/user/reset-password', { resetToken, newPassword: password });
+      if (ok) {
         toast.success('Password updated. You can now login.');
         navigate('/login');
       } else {
-        const errMsg = data.message || 'Unable to reset password';
+        const errMsg = data?.message || 'Unable to reset password';
         setError(errMsg);
         toast.error(errMsg);
       }

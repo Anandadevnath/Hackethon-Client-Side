@@ -5,12 +5,9 @@ import { useAuth } from "../context/AuthContext";
 import { CloudSun, AlertTriangle, Info, Plus, Eye } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import api from '../services/api';
 
-const API_BASE =
-  (typeof import.meta !== "undefined" &&
-    import.meta.env &&
-    import.meta.env.VITE_API_BASE) ||
-  "https://hackethon-server-side-1.onrender.com";
+// server base is provided by `src/services/api.js` via VITE_API_BASE
 
 const motionContainer = {
   hidden: { opacity: 0, y: 12 },
@@ -79,13 +76,8 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem("accessToken");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await fetch(`${API_BASE}/crop/`, {
-        method: "GET",
-        headers,
-        credentials: "include",
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
+      const { ok, data } = await api.get('/crop/', { headers });
+      if (ok) {
         setCrops(Array.isArray(data) ? data : data.data ?? []);
       } else {
         setCrops([]);
@@ -249,28 +241,21 @@ export default function Dashboard() {
     setCreating(true);
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`${API_BASE}/crop/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      const body = {
+        cropType: form.cropType,
+        estimatedWeightKg: Number(form.estimatedWeightKg || 0),
+        harvestDate: form.harvestDate,
+        storageLocation: {
+          division: form.storageDivision,
+          district: form.storageDistrict,
         },
-        credentials: "include",
-        body: JSON.stringify({
-          cropType: form.cropType,
-          estimatedWeightKg: Number(form.estimatedWeightKg || 0),
-          harvestDate: form.harvestDate,
-          storageLocation: {
-            division: form.storageDivision,
-            district: form.storageDistrict,
-          },
-          storageType: form.storageType,
-          notes: form.notes,
-        }),
-      });
+        storageType: form.storageType,
+        notes: form.notes,
+      };
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
+      const { ok, data } = await api.post('/crop/', body, { headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
+
+      if (!ok) {
         const errs =
           data?.errors ??
           (data?.message ? [data.message] : ["Failed to create"]);

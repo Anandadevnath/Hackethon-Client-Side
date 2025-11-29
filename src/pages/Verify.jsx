@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import api from '../services/api';
 
 const Verify = () => {
   const location = useLocation();
@@ -17,18 +18,13 @@ const Verify = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:8000/user/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        const token = data.resetToken;
+      const { ok, data } = await api.post('/user/verify-otp', { email, otp });
+      if (ok) {
+        const token = data?.resetToken;
         toast.success('OTP verified — proceed to reset password');
         navigate('/reset-password', { state: { resetToken: token } });
       } else {
-        const errMsg = data.message || 'Invalid OTP';
+        const errMsg = (data && data.message) || 'Invalid OTP';
         setError(errMsg);
         toast.error(errMsg);
       }

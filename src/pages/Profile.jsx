@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 import { Sparkles, User, Phone, Image as ImageIcon, MapPin, Globe, KeyRound, CheckCircle } from 'lucide-react';
 
 const Profile = () => {
@@ -44,19 +45,12 @@ const Profile = () => {
     else setStatus(result.data?.message || 'Update failed');
   };
 
-  const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) || 'http://localhost:8000';
-
   const sendOtp = async () => {
     setOtpStatus('');
     try {
-      const res = await fetch(`${API_BASE}/user/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user?.email })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) setOtpStatus(data.message || 'OTP sent! Check your email.');
-      else setOtpStatus(data.message || 'Failed to send OTP');
+      const { ok, data } = await api.post('/user/forgot-password', { email: user?.email });
+      if (ok) setOtpStatus(data?.message || 'OTP sent! Check your email.');
+      else setOtpStatus(data?.message || 'Failed to send OTP');
     } catch (err) {
       setOtpStatus('Network error sending OTP');
     }
@@ -65,16 +59,11 @@ const Profile = () => {
   const verifyOtp = async () => {
     setOtpStatus('');
     try {
-      const res = await fetch(`${API_BASE}/user/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user?.email, otp })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.resetToken) {
+      const { ok, data } = await api.post('/user/verify-otp', { email: user?.email, otp });
+      if (ok && data?.resetToken) {
         setResetToken(data.resetToken);
         setOtpStatus('OTP verified — enter your new password');
-      } else setOtpStatus(data.message || 'Invalid OTP');
+      } else setOtpStatus(data?.message || 'Invalid OTP');
     } catch (err) {
       setOtpStatus('Network error verifying OTP');
     }
@@ -86,20 +75,14 @@ const Profile = () => {
     if (newPassword !== confirmPassword) return setOtpStatus('Passwords do not match');
 
     try {
-      const res = await fetch(`${API_BASE}/user/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resetToken, newPassword })
-      });
-      const data = await res.json().catch(() => ({}));
-
-      if (res.ok) {
-        setOtpStatus(data.message || 'Password updated');
+      const { ok, data } = await api.post('/user/reset-password', { resetToken, newPassword });
+      if (ok) {
+        setOtpStatus(data?.message || 'Password updated');
         setResetToken(null);
         setOtp('');
         setNewPassword('');
         setConfirmPassword('');
-      } else setOtpStatus(data.message || 'Failed to update password');
+      } else setOtpStatus(data?.message || 'Failed to update password');
     } catch (err) {
       setOtpStatus('Network error updating password');
     }

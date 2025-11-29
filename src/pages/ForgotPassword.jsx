@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
+import api from '../services/api';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -15,21 +16,15 @@ const ForgotPassword = () => {
     setMessage("");
     setError("");
     try {
-      const res = await fetch("https://hackethon-server-side-1.onrender.com/user/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        const msg = data.message || "If that email exists, a reset link has been sent.";
+      const { ok, data } = await api.post('/user/forgot-password', { email });
+      if (ok) {
+        const msg = data?.message || "If that email exists, a reset link has been sent.";
         setMessage(msg);
         toast.success(msg);
         // navigate to verify page so user can enter OTP
         navigate('/verify', { state: { email } });
       } else {
-        const errMsg = data.message || "Unable to process request.";
+        const errMsg = data?.message || "Unable to process request.";
         setError(errMsg);
         toast.error(errMsg);
       }
