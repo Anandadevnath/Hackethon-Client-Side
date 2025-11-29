@@ -1,0 +1,161 @@
+import React, { useEffect, useState, useRef } from 'react';
+export default function BanglaVoice({ upazila = 'Bangladesh', weather = {}, advisory = '', tips = [], crops = [] }) {
+  const [supported, setSupported] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [response, setResponse] = useState('');
+  const [useText, setUseText] = useState(false);
+  const [input, setInput] = useState('');
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setSupported(false);
+      return;
+    }
+    setSupported(true);
+    const r = new SpeechRecognition();
+    r.lang = 'bn-BD';
+    r.interimResults = false;
+    r.maxAlternatives = 1;
+    r.onresult = (ev) => {
+      const text = ev.results[0][0].transcript.trim();
+      setTranscript(text);
+      processQuery(text);
+    };
+    r.onend = () => setListening(false);
+    r.onerror = () => setListening(false);
+    recognitionRef.current = r;
+  }, []);
+
+  const speak = (txt) => {
+    try {
+      const u = new SpeechSynthesisUtterance(txt);
+      u.lang = 'bn-BD';
+      const voices = window.speechSynthesis.getVoices() || [];
+      const bn = voices.find(v => /bn|bengali|bangla/i.test(v.lang || v.name));
+      if (bn) u.voice = bn;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (e) {
+    }
+  };
+
+  const processQuery = (q) => {
+    if (!q) return;
+    const lower = q.toLowerCase();
+
+    // Common question patterns in Bangla
+    if (lower.includes('আবহাও') || (lower.includes('কেমন') && lower.includes('আবহাও'))) {
+      const txt = weather && weather.temp
+        ? `এখানের আবহাওয়া ${weather.temp}, আর্দ্রতা ${weather.humidity || ''} এবং বৃষ্টির সম্ভাব্যতা ${weather.rainfall || ''}।` 
+        : `আমি আপনার এলাকার সাম্প্রতিক আবহাওয়া তথ্য পাচ্ছি না, দয়া করে উপ-জেলার নামটি ঠিক আছে কিনা দেখুন।`;
+      setResponse(txt);
+      speak(txt);
+      return;
+    }
+
+    if (lower.includes('আমার ধানে') || (lower.includes('ধানে') && lower.includes('কেমন'))) {
+      const adv = advisory || '';
+      const txt = adv ? `আপনার ফসল সম্পর্কে সাধারণ পরামর্শ: ${adv}` : 'আপনার ফসলের বিস্তারিত পাওয়া যায়নি — দয়া করে ফসলটি যুক্ত করুন বা টেক্সটে বলুন।';
+      setResponse(txt);
+      speak(txt);
+      return;
+    }
+
+    if (lower.includes('গুদামে') || lower.includes('গুদাম')) {
+      const t = (tips && tips.length > 0) ? `সংরক্ষণের পরামর্শ: ${tips.slice(0,3).join(' । ')}` : 'গুদাম সম্পর্কিত পরামর্শ পাওয়া যায়নি।';
+      setResponse(t);
+      speak(t);
+      return;
+    }
+
+    if (lower.includes('কবে') && lower.includes('কাট')) {
+      // try to find next harvest date from crops
+      const item = (crops && crops.length > 0) ? crops[0] : null;
+      if (item && item.harvestDate) {
+        try {
+          const then = new Date(item.harvestDate);
+          const diff = Math.ceil((then - new Date()) / (1000 * 60 * 60 * 24));
+          const txt = diff > 0 ? `প্রস্তাবিত কাটা: ${diff} দিনের মধ্যে (${item.harvestDate}) ।` : `আপনার প্রদানকৃত তারিখ ${item.harvestDate} হয়ত অতীত বা আজকের তারিখ।`;
+          setResponse(txt);
+          speak(txt);
+          return;
+        } catch (e) { }
+      }
+      const fallback = 'কোনো নির্দিষ্ট ফসলের তথ্য নেই — আপনি কোন ফসল কাটার সময় জানতে চান? টেক্সট বক্সে লিখে জানান।';
+      setResponse(fallback);
+      speak(fallback);
+      return;
+    }
+
+    // fallback generic reply
+    const fallback = 'দুঃখিত, আমি বুঝতে পারিনি। অনুগ্রহ করে পুনরায় বলেন অথবা নিচের টেক্সট বক্সে বাংলায় লিখুন।';
+    setResponse(fallback);
+    speak(fallback);
+  };
+
+  const toggleListen = () => {
+    if (!recognitionRef.current) return setUseText(true);
+    if (listening) {
+      recognitionRef.current.stop();
+      setListening(false);
+    } else {
+      setTranscript('');
+      setResponse('');
+      try {
+        recognitionRef.current.start();
+        setListening(true);
+      } catch (e) {
+        setUseText(true);
+      }
+    }
+  };
+
+  const submitText = (e) => {
+    e?.preventDefault();
+    const q = input.trim();
+    if (!q) return;
+    setTranscript(q);
+    processQuery(q);
+    setInput('');
+  };
+
+  return (
+    <div className="bg-white rounded-2xl p-4 shadow-md border border-[#f3f7f4]">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h4 className="font-semibold text-[#0b5f37]">Bangla Voice Assistant</h4>
+          <div className="text-xs text-gray-500">Speak in Bangla (bn-BD). Fallback to text available.</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setUseText(v => !v)} className="text-sm px-3 py-1 rounded bg-gray-100">{useText ? 'Speech' : 'Text'}</button>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {useText ? (
+          <form onSubmit={submitText} className="flex gap-2">
+            <input value={input} onChange={e => setInput(e.target.value)} placeholder="বাংলায় লিখুন..." className="flex-1 border p-2 rounded" />
+            <button type="submit" className="px-3 bg-[#0f7a48] text-white rounded">Send</button>
+          </form>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button onClick={toggleListen} className={`w-12 h-12 rounded-full ${listening ? 'bg-red-500' : 'bg-green-500'} text-white`}>{listening ? '●' : '🎤'}</button>
+            <div className="flex-1">
+              <div className="text-sm text-gray-600">{transcript || 'Listening stopped.'}</div>
+            </div>
+          </div>
+        )}
+
+        <div className="p-3 bg-gray-50 rounded text-sm text-gray-700">
+          <div className="font-semibold mb-1">Response</div>
+          <div>{response || '—'}</div>
+        </div>
+
+        <div className="text-xs text-gray-400">Supported questions examples: "আজকে আবহাওয়া?", "আমার ধানে অবস্থা কেমন?", "গুদামে কী করব?", "কবে কাটব?"</div>
+      </div>
+    </div>
+  );
+}

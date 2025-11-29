@@ -6,8 +6,7 @@ import { CloudSun, AlertTriangle, Info, Plus, Eye } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from '../services/api';
-
-// server base is provided by `src/services/api.js` via VITE_API_BASE
+import BanglaVoice from '../components/BanglaVoice';
 
 const motionContainer = {
   hidden: { opacity: 0, y: 12 },
@@ -552,6 +551,21 @@ export default function Dashboard() {
                 <li key={idx}>{t}</li>
               ))}
             </ul>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className=""
+          >
+            <BanglaVoice
+              upazila={upazila}
+              weather={weather}
+              advisory={generateBanglaAdvisory(forecast, crops)}
+              tips={tips}
+              crops={crops}
+            />
           </motion.div>
         </div>
       </div>
