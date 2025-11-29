@@ -51,25 +51,25 @@ const Navbar = () => {
           </div>
         <div className="hidden md:flex items-center gap-4">
           <button onClick={() => setLang(l => l === 'en' ? 'bn' : 'en')} className="flex items-center gap-2 text-sm">
-            <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
-            <span className="text-[#67e794] font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
+            <span role="img" aria-label="language" className="text-[1.1em]">🌐</span>
+            <span className={`font-semibold transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#67e794]'}`}>{lang === 'en' ? 'বাংলা' : 'EN'}</span>
           </button>
 
-          <Link to="/about" className="text-[#73ffa4] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
+          <Link to="/about" className={`text-base font-semibold no-underline px-2 py-1 rounded transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a] hover:bg-black/5' : 'text-[#73ffa4] hover:bg-white/5'}`}>{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
 
           {user ? (
-            <Link to="/dashboard" className="bg-white/90 text-[#0b6b3a] px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.06)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
+            <Link to="/dashboard" className="bg-[#0b6b3a] text-white px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.15)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
           ) : null}
 
           {user ? (
             <div className="relative flex items-center" ref={wrapperRef}>
-              <div className="flex items-center gap-2 cursor-pointer text-[#fffbe6]" onClick={() => setMenuOpen(v => !v)} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setMenuOpen(v => !v)}>
+              <div className={`flex items-center gap-2 cursor-pointer transition-colors duration-200 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#fffbe6]'}`} onClick={() => setMenuOpen(v => !v)} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setMenuOpen(v => !v)}>
                 {user.avatar ? (
-                  <img src={user.avatar} alt={user.name || 'Profile'} className="w-11 h-11 rounded-full object-cover border-2 border-white/12" />
+                  <img src={user.avatar} alt={user.name || 'Profile'} className={`w-10 h-10 rounded-full object-cover border-2 ${scrolled ? 'border-[#0b6b3a]/20' : 'border-white/20'}`} />
                 ) : (
-                  <div className="w-11 h-11 rounded-full inline-flex items-center justify-center bg-black/15 text-[#fffbe6] font-bold">{(user.name && user.name[0]) || 'U'}</div>
+                  <div className={`w-10 h-10 rounded-full inline-flex items-center justify-center font-bold ${scrolled ? 'bg-[#0b6b3a]/10 text-[#0b6b3a]' : 'bg-black/15 text-[#fffbe6]'}`}>{(user.name && user.name[0]) || 'U'}</div>
                 )}
-                <span className="text-[#fffbe6] font-semibold">{user.name || user.email || 'User'}</span>
+                <span className="font-semibold">{user.name || user.email || 'User'}</span>
               </div>
 
               <div className={`absolute right-0 top-full mt-2 bg-gradient-to-b from-white to-[#fbfff8] text-[#0a4d2c] rounded-[10px] shadow-[0_10px_28px_rgba(6,40,20,0.12)] min-w-[180px] flex flex-col overflow-hidden z-[10001] transition-all duration-150 ${menuOpen ? 'opacity-100 translate-y-0 visible pointer-events-auto' : 'opacity-0 translate-y-1 invisible pointer-events-none'}`}>
@@ -85,11 +85,11 @@ const Navbar = () => {
 
         {/* Mobile hamburger */}
         <div className="flex items-center md:hidden">
-          <button onClick={() => setMobileOpen(v => !v)} aria-label="Toggle menu" className="p-2 rounded-md bg-white/6 backdrop-blur-sm">
+          <button onClick={() => setMobileOpen(v => !v)} aria-label="Toggle menu" className={`p-2 rounded-md backdrop-blur-sm ${scrolled ? 'bg-[#0b6b3a]/10' : 'bg-white/10'}`}>
             {mobileOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${scrolled ? 'text-[#0b6b3a]' : 'text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${scrolled ? 'text-[#0b6b3a]' : 'text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
             )}
           </button>
         </div>
@@ -98,18 +98,18 @@ const Navbar = () => {
       {/* Mobile menu panel */}
       <div className={`md:hidden px-4 pb-4 transition-max-h duration-300 overflow-hidden ${mobileOpen ? 'max-h-[400px] ease-out' : 'max-h-0'}`}>
         <div className="flex flex-col gap-3 pt-3">
-          <button onClick={() => { setLang(l => l === 'en' ? 'bn' : 'en'); setMobileOpen(false); }} className="flex items-center gap-2 text-sm text-[#fffbe6]">
-            <span role="img" aria-label="language" className="text-[#1ecfff] text-[1.1em]">🌐</span>
+          <button onClick={() => { setLang(l => l === 'en' ? 'bn' : 'en'); setMobileOpen(false); }} className={`flex items-center gap-2 text-sm ${scrolled ? 'text-[#0b6b3a]' : 'text-[#fffbe6]'}`}>
+            <span role="img" aria-label="language" className="text-[1.1em]">🌐</span>
             <span className="font-semibold">{lang === 'en' ? 'বাংলা' : 'EN'}</span>
           </button>
 
-          <Link to="/about" onClick={() => setMobileOpen(false)} className="text-[#fffbe6] text-base font-semibold no-underline px-2 py-1 rounded hover:bg-white/5">{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
+          <Link to="/about" onClick={() => setMobileOpen(false)} className={`text-base font-semibold no-underline px-2 py-1 rounded ${scrolled ? 'text-[#0b6b3a] hover:bg-black/5' : 'text-[#fffbe6] hover:bg-white/5'}`}>{lang === 'en' ? 'About Us' : 'আমাদের সম্পর্কে'}</Link>
 
           {user ? (
             <>
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block bg-white/90 text-[#0b6b3a] px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.06)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
-              <Link to="/profile" onClick={() => setMobileOpen(false)} className="block text-[#fffbe6] px-2 py-2">{lang === 'en' ? 'Profile' : 'প্রোফাইল'}</Link>
-              <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="text-left px-2 py-2 text-[#fffbe6]">{lang === 'en' ? 'Logout' : 'লগআউট'}</button>
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block bg-[#0b6b3a] text-white px-3 py-2 rounded-[10px] font-bold no-underline shadow-[0_6px_14px_rgba(6,40,20,0.15)]">{lang === 'en' ? 'Dashboard' : 'ড্যাশবোর্ড'}</Link>
+              <Link to="/profile" onClick={() => setMobileOpen(false)} className={`block px-2 py-2 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#fffbe6]'}`}>{lang === 'en' ? 'Profile' : 'প্রোফাইল'}</Link>
+              <button onClick={() => { handleLogout(); setMobileOpen(false); }} className={`text-left px-2 py-2 ${scrolled ? 'text-[#0b6b3a]' : 'text-[#fffbe6]'}`}>{lang === 'en' ? 'Logout' : 'লগআউট'}</button>
             </>
           ) : (
             <Link to="/login" onClick={() => setMobileOpen(false)} className="block bg-gradient-to-r from-[#9ef96a] to-[#49c74f] text-[#05310d] rounded-[28px] px-4 py-2 font-bold no-underline shadow-[0_10px_30px_rgba(46,125,50,0.18),0_0_0_6px_rgba(73,199,79,0.06)] transition-transform duration-150 hover:-translate-y-1">{lang === 'en' ? 'Join the Movement' : 'যোগ দিন'}</Link>
