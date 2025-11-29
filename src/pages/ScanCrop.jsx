@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import PestUpload from "../components/PestUpload";
 
 // Backend server runs on port 3000 by default (see server.js)
 const API_URL = "https://hackethon-server-side-1.onrender.com";
@@ -485,8 +486,10 @@ export default function ScanCrop() {
                 padding: "10px",
                 minHeight: "180px",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: "center", // vertical center
+                justifyContent: "center", // horizontal center
+                textAlign: "center",
+                overflow: "hidden",
               }}
             >
               {imagePreview ? (
@@ -495,8 +498,10 @@ export default function ScanCrop() {
                   alt="Leaf preview"
                   style={{
                     maxWidth: "100%",
-                    maxHeight: "220px",
+                    maxHeight: "100%",
                     borderRadius: "10px",
+                    objectFit: "contain",
+                    display: "block",
                   }}
                 />
               ) : (
@@ -609,7 +614,31 @@ export default function ScanCrop() {
             </div>
           </div>
         </div>
+        {/* Pest Identification Card below the leaf health checker */}
+        <div
+          style={{
+            marginTop: "24px",
+            borderRadius: "16px",
+            border: "1px solid #e5e7eb",
+            padding: "16px",
+            backgroundColor: "#f9fafb",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "18px",
+              fontWeight: "700",
+              color: "#14532d",
+              marginBottom: "12px",
+            }}
+          >
+            পোকা শনাক্তকরণ / Pest Identification
+          </h2>
+          <PestUpload />
+        </div>
       </div>
+
       {/* Hidden canvas for processing */}
       <canvas
         ref={canvasRef}
