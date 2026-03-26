@@ -1,16 +1,160 @@
-# React + Vite
+# HarvestGuard Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HarvestGuard Client is the frontend for a climate-aware crop safety platform.  
+It combines risk visibility, weather context, and AI-assisted crop scanning in one experience designed for real field workflows in Bangladesh.
 
-Currently, two official plugins are available:
+## Why This Project Exists
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Farm decisions are often time-sensitive, but data is scattered. HarvestGuard brings key signals together so users can act earlier and with more confidence.
 
-## React Compiler
+- crop storage tracking in one place
+- localized weather-aware warnings
+- image-based crop health checks
+- bilingual usage (Bangla and English)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## What Makes It Different
 
-## Expanding the ESLint configuration
+- Practical first: focuses on actions users can take now, not only analytics.
+- Local context: district/division-aware flows and Bangladesh-focused data.
+- Built for mixed users: clear UI for non-technical users plus rich data for operators.
+- Resilient behavior: fallback logic in alerting keeps the experience usable.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Feature Highlights
+
+### Authentication
+
+- registration and login
+- forgot password, verify, reset flow
+- profile update and session restore
+
+### Dashboard
+
+- create, update, delete crop batches
+- weather highlights and forecast context
+- location-aware advisories and alerts
+
+### Risk and Warnings
+
+- division and district filtering
+- XLSX-driven mock risk dataset support
+- smart alert generation with local fallback handling
+
+### Crop Scan
+
+- camera capture and image upload
+- AI prediction integration for leaf health
+
+### User Experience
+
+- Bangla and English language support
+- smooth transitions with Framer Motion
+- responsive layout for desktop and mobile
+
+## Stack
+
+- React 19
+- Vite 7
+- React Router
+- Tailwind CSS
+- Framer Motion
+- React Hot Toast
+- Leaflet / React Leaflet
+- TensorFlow.js
+- XLSX
+
+## Project Layout
+
+```text
+src/
+  components/  reusable UI building blocks
+  context/     auth and language providers
+  data/        static datasets and form helpers
+  pages/       route-level pages
+  services/    API wrapper and smart alert logic
+  styles/      global and page-level styles
+  utils/       risk engine and helpers
+```
+
+## Route Map
+
+- / : landing page
+- /dashboard : crop and weather workspace
+- /warnings : risk dashboard
+- /scan-crop : AI scan flow
+- /about : project information
+- /login : sign in
+- /register : sign up
+- /forgot : password recovery
+- /verify : account verification
+- /reset-password : password reset
+- /profile : user profile
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18 or newer
+- npm 9 or newer
+
+### Install
+
+```bash
+npm install
+```
+
+### Environment
+
+Create `.env` in the root:
+
+```env
+VITE_API_BASE=https://your-backend-api.example.com
+```
+
+Behavior notes:
+
+- if `VITE_API_BASE` is not set, local development uses a hosted fallback backend
+- production should always define `VITE_API_BASE` explicitly
+
+### Run
+
+```bash
+npm run dev
+```
+
+## Scripts
+
+- `npm run dev` : start development server
+- `npm run build` : build production bundle
+- `npm run preview` : preview production build
+- `npm run lint` : run lint checks
+
+## Data Sources
+
+- `public/mock_batch_state_data.xlsx` powers warning dashboard mock inputs
+- `src/data/` contains crisis, location, and form datasets
+
+## API Surface Used by Client
+
+- `/user/*` for auth and profile
+- `/crop/*` for crop batch management
+- `/api/smart-alert` for smart alert generation
+- `/api/predict` for AI leaf/crop prediction endpoint
+
+## Build and Deploy
+
+```bash
+npm run build
+```
+
+Deploy `dist/` to your static host of choice.  
+Set `VITE_API_BASE` in the deployment environment before release.
+
+## Engineering Notes
+
+- lint config is defined in `eslint.config.js`
+- keep service URLs in environment variables when possible
+- API access is centralized in `src/services/api.js`
+
+---
+
+Built for Hackethon as the frontend experience for HarvestGuard.
