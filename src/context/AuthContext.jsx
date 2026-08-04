@@ -23,8 +23,10 @@ export const AuthProvider = ({ children }) => {
       }
       if (data && data.errors && Array.isArray(data.errors)) {
         setMessage(data.errors.join(', '));
+      } else if (data && data.message) {
+        setMessage(data.message);
       } else {
-        setMessage(data?.message || 'Registration failed');
+        setMessage('Registration failed');
       }
       setLoading(false);
       return { ok: false, data };
@@ -48,7 +50,11 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return { ok: true, data };
       }
-      setMessage(data?.message || 'Login failed');
+      if (data && data.message) {
+        setMessage(data.message);
+      } else {
+        setMessage('Login failed');
+      }
       setLoading(false);
       return { ok: false, data };
     } catch (err) {

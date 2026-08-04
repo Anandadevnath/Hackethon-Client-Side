@@ -94,7 +94,10 @@ const Register = () => {
       toast.success(result.data?.message || (isBn ? 'সফলভাবে নিবন্ধন হয়েছে' : 'Registered successfully'));
       navigate('/login');
     } else {
-      toast.error(result?.data?.message || result?.error?.message || (isBn ? 'নিবন্ধন ব্যর্থ হয়েছে' : 'Registration failed'));
+      // Improved error display
+      const errorMsg = result?.data?.message || result?.data?.errors?.join(', ') || result?.error?.message || (isBn ? 'নিবন্ধন ব্যর্থ হয়েছে' : 'Registration failed');
+      toast.error(errorMsg);
+      setMessage(errorMsg); // Also update local message state for display
     }
   };
 
