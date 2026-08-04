@@ -10,24 +10,53 @@ export default function BanglaVoice({ weather = {}, advisory = '', tips = [], cr
 
   const { listening, transcript, processing, toggleListen } = useBanglaVoice(lang);
 
-  const speak = (txt) => {
-    const u = new SpeechSynthesisUtterance(txt);
-    u.lang = lang === 'bn' ? 'bn-BD' : 'en-US';
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
+  const speak = async (txt) => {
+    console.log('Attempting TTS for:', txt);
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: txt }),
+      });
+      console.log('TTS response status:', res.status);
+      const data = await res.json();
+      console.log('TTS response data:', data);
+      if (data.ok && data.audioBase64) {
+        console.log('Playing audio...');
+        const audio = new Audio(data.audioBase64);
+        audio.play().catch(e => console.error('Audio play failed:', e));
+      } else {
+        console.error('TTS failed:', data.error);
+      }
+    } catch (err) {
+      console.error('TTS error:', err);
+    }
   };
 
   const processQuery = (q) => {
     if (!q) return;
     const lower = q.toLowerCase();
 
-    // Logic remains mostly the same, but simplified for brevity
-    let txt = 'দুঃখিত, আমি বুঝতে পারিনি।';
-    if (lower.includes('আবহাও')) {
-      txt = weather.temp ? `এখানের আবহাওয়া ${weather.temp}।` : 'আবহাওয়ার তথ্য নেই।';
-    } else if (lower.includes('ধানে')) {
-      txt = advisory || 'কোনো পরামর্শ নেই।';
+    // Map keywords to responses
+    const responses = {
+      'আবহাও': weather.temp ? `এখানের আবহাওয়া ${weather.temp}।` : 'আবহাওয়ার তথ্য নেই।',
+      'বৃষ্টি': weather.temp ? `এখানের আবহাওয়া ${weather.temp}।` : 'আবহাওয়ার তথ্য নেই।',
+      'ধানে': advisory || 'কোনো পরামর্শ নেই।',
+      'রোগ': 'আপনার ফসলের রোগ সনাক্ত করতে ছবি আপলোড করুন।',
+      'হ্যালো': 'হ্যালো! আমি আপনাকে কীভাবে সাহায্য করতে পারি?',
+      'ধন্যবাদ': 'আপনাকে স্বাগতম!'
+    };
+
+    let txt = 'দুঃখিত, আমি বুঝতে পারিনি। অনুগ্রহ করে অন্যভাবে জিজ্ঞাসা করুন।';
+
+    // Check for keyword matches in the query
+    for (const key in responses) {
+      if (lower.includes(key)) {
+        txt = responses[key];
+        break;
+      }
     }
+
     setResponse(txt);
     speak(txt);
   };

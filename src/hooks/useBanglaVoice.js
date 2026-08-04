@@ -24,27 +24,20 @@ export const useBanglaVoice = (lang) => {
 
   const toggleListen = (onResult) => {
     if (listening) {
-      if (lang === 'bn') {
-        mediaRecorderRef.current?.stop();
-      } else {
-        recognitionRef.current?.stop();
-      }
+      recognitionRef.current?.stop();
       setListening(false);
       return;
     }
 
     setTranscript('');
     setListening(true);
-    if (lang === 'bn') {
-      startRecording(onResult);
-    } else {
-      recognitionRef.current.onresult = (ev) => {
-        const text = ev.results[0][0].transcript.trim();
-        setTranscript(text);
-        onResult(text);
-      };
-      recognitionRef.current.start();
-    }
+
+    recognitionRef.current.onresult = (ev) => {
+      const text = ev.results[0][0].transcript.trim();
+      setTranscript(text);
+      onResult(text);
+    };
+    recognitionRef.current.start();
   };
 
   const startRecording = async (onResult) => {
