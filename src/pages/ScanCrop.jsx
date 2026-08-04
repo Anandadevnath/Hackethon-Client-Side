@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PestUpload from "../components/PestUpload";
 import { motion } from "framer-motion";
 
-const API_URL = "https://hackethon-server-side-1.onrender.com";
+const API_URL = "https://hackethon-server-side-br4m.vercel.app";
 
 const fadeUp = {
 hidden: { opacity: 0, y: 30 },
