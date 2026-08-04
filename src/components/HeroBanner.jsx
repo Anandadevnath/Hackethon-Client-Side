@@ -6,9 +6,7 @@ import { Button } from './common/Button';
 
 export default function HeroBanner() {
   const bgImage = `linear-gradient(180deg, rgba(2, 20, 12, 0.35), rgba(4, 10, 6, 0.55)), url(${heroBg})`;
-
   const { lang } = useLanguage();
-
   const isBn = lang === 'bn';
 
   return (
@@ -40,7 +38,7 @@ export default function HeroBanner() {
               <>
                 আপনার কৃষি যাত্রায়
                 <br />
-                নতুনত্ব নিয়ে আসছি。
+                নতুনত্ব নিয়ে আসছি।
               </>
             ) : (
               <>
@@ -60,11 +58,11 @@ export default function HeroBanner() {
           </motion.p>
 
           <motion.div className="flex gap-5 items-center" initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}>
-            <Button variant="primary" className="bg-[#0b6b3a] hover:bg-[#095730] transition-colors shadow-lg px-8 py-3 rounded-xl text-lg font-bold" onClick={() => {}}>
+            <Button variant="primary" className="bg-[#0b6b3a] hover:bg-[#095730] transition-colors shadow-lg px-8 py-3 rounded-xl text-lg font-bold">
               {isBn ? 'শুরু করুন' : 'Get Started'} <span className="font-extrabold">→</span>
             </Button>
 
-            <Button variant="secondary" onClick={() => {}}>
+            <Button variant="secondary">
               {isBn ? 'আরও জানুন' : 'Learn More'}
             </Button>
           </motion.div>
@@ -92,5 +90,3 @@ export default function HeroBanner() {
     </section>
   );
 }
-
-

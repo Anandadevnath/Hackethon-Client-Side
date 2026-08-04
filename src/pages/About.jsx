@@ -48,10 +48,10 @@ const About = () => {
   const t = STRINGS[lang] || STRINGS.en;
 
   return (
-    <div id="about" className="w-full min-h-screen bg-gray-50 flex flex-col">
+    <div id="about" className="min-h-screen bg-[#F5FFF6] px-4 py-8 mt-20 max-w-[1400px] mx-auto">
 
       {/* ------------------------- HEADER SECTION ------------------------- */}
-      <div className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
+      <div className="relative w-full h-[60vh] md:h-[50vh] overflow-hidden rounded-3xl mb-12">
 
         {/* Background Image */}
         <img
@@ -82,7 +82,7 @@ const About = () => {
       </div>
 
       {/* ------------------------- BODY SECTION ------------------------- */}
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-6 pb-16">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -184,112 +184,29 @@ export default function CrisisSection() {
   ];
 
   return (
-    <section className="relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#fff7f4] via-[#ffe8df] to-[#ffd7ca] py-20 px-5">
-
-      {/* Decorative Gradient Blobs */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-32 -top-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ffd7ca] to-[#fff2f0] opacity-60 blur-3xl transform -rotate-12" />
-        <div className="absolute -right-40 bottom-0 w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-[#fff7f4] to-[#ffe8df] opacity-60 blur-2xl" />
-      </div>
-
-      <div className="max-w-[1100px] mx-auto grid gap-8">
-        <motion.div variants={container} initial="hidden" animate={controls} className="grid gap-5">
-
-          {/* Header */}
-          <motion.div variants={fadeUp} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-
-            <div className="flex items-start gap-5">
-              <motion.div variants={float} animate="animate" className="w-16 h-16 rounded-2xl bg-[rgba(255,60,60,0.14)] text-[#ff2e2e] flex items-center justify-center text-2xl shadow-[0_14px_28px_rgba(255,80,60,0.15)]">
-                <span aria-hidden>⚠️</span>
-              </motion.div>
-
+    <section className="py-20 px-5 bg-white">
+      <div className="max-w-[1100px] mx-auto grid gap-12">
+        <motion.div variants={container} initial="hidden" animate={controls} className="grid gap-8">
+          <motion.div variants={fadeUp} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 p-8 bg-green-50 rounded-3xl border border-green-100">
+            <div className="flex items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-3xl shadow-inner">⚠️</div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-[#6e0d0d] leading-tight">
-                  {isBn ? 'আমরা যে সংকটে আছি' : 'The Crisis We Face'}
-                </h2>
-                <p className="mt-2 text-sm text-[#5a3b2b] max-w-lg">
-                  {isBn
-                    ? 'বাংলাদেশ প্রতিবছর খাদ্য ব্যবস্থায় কোটি কোটি টাকার ক্ষতির মুখে পড়ে। এটি শুধু পরিসংখ্যান নয়—এটি বাস্তব ক্ষুধা।'
-                    : 'Bangladesh loses billions in food every year. This is not just numbers—this is real hunger and wasted resources.'}
-                </p>
+                <h2 className="text-3xl font-extrabold text-green-950">{isBn ? 'আমরা যে সংকটে আছি' : 'The Crisis We Face'}</h2>
+                <p className="mt-2 text-green-800/80 max-w-lg">{isBn ? 'বাংলাদেশ প্রতিবছর খাদ্য ব্যবস্থায় কোটি কোটি টাকার ক্ষতির মুখে পড়ে।' : 'Bangladesh loses billions in food every year.'}</p>
               </div>
             </div>
-
-            <div className="flex gap-3 items-center">
-              <button onClick={handleViewReport} className="hidden md:inline-flex items-center gap-2 bg-white/90 backdrop-blur rounded-xl px-4 py-2 shadow hover:scale-105 transition-transform text-sm">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M12 4v8l6 3" stroke="#6e0d0d" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                <span className="text-[#6e0d0d]">{isBn ? 'বিস্তারিত রিপোর্ট' : 'View Report'}</span>
-              </button>
-            </div>
           </motion.div>
-
-          {/* Stats - Compact */}
-          <motion.div variants={fadeUp} className="grid grid-cols-3 gap-3 md:gap-4">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {stats.map((card, i) => (
-              <motion.div key={i} whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 260 }} className="bg-white rounded-2xl p-4 shadow-md flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#ff8a5b] to-[#ff4c2e] flex items-center justify-center text-xl text-white shadow-sm">{card.icon}</div>
-                <div>
-                  <div className="text-lg md:text-2xl font-extrabold text-[#222]">{card.number}</div>
-                  <div className="text-[10px] md:text-xs text-[#6b7578]">{isBn ? card.labelBn : card.labelEn}</div>
-                </div>
-              </motion.div>
+              <StatCard key={i} icon={card.icon} number={card.number} label={isBn ? card.labelBn : card.labelEn} />
             ))}
           </motion.div>
-
-          {/* Map Section - Compact */}
-          <motion.div variants={fadeUp} className="mt-4">
-            {/* Header with Legend */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
-              <h3 className="text-lg md:text-xl font-bold text-[#6e0d0d]">{isBn ? 'স্থানীয় ঝুঁকি মানচিত্র' : 'Local Risk Map'}</h3>
-              
-              {/* Legend */}
-              <div className="flex flex-wrap items-center gap-3 text-xs bg-white/70 backdrop-blur px-3 py-1.5 rounded-lg">
-                <div className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]"></span>
-                  <span className="text-[#546168]">{isBn ? 'আপনি' : 'You'}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]"></span>
-                  <span className="text-[#546168]">{isBn ? 'নিম্ন' : 'Low'}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
-                  <span className="text-[#546168]">{isBn ? 'মধ্যম' : 'Medium'}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span>
-                  <span className="text-[#546168]">{isBn ? 'উচ্চ' : 'High'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Dynamic alert banner */}
-            {alerts && alerts.length > 0 ? (
-              <div className="mb-2 p-2.5 rounded-xl bg-gradient-to-r from-[#ffe7e5] to-[#ffd2cf] border border-[#ffb7b2] flex items-center justify-between gap-2">
-                <div className="text-xs text-[#6e0d0d] flex-1">
-                  ⚠️ {isBn ? `সতর্কতা: কাছাকাছি ${alerts.length}টি ঝুঁকিপূর্ণ পয়েন্ট` : `Alert: ${alerts.length} risky points nearby`}
-                </div>
-                <button onClick={handleViewAlert} className="bg-[#ef4444] text-white px-3 py-1 rounded-lg text-xs font-medium shadow hover:bg-[#dc2626] transition-colors">{isBn ? 'দেখুন' : 'View'}</button>
-              </div>
-            ) : (
-              <div className="mb-2 p-2.5 rounded-xl bg-white/90 border border-[#e6f7ec] flex items-center justify-between gap-2">
-                <div className="text-xs text-[#155724]">✓ {isBn ? 'কোনো আশঙ্কাজনক রিপোর্ট নেই' : 'No concerning reports nearby'}</div>
-                <button onClick={handleViewReport} className="bg-[#22c55e] text-white px-3 py-1 rounded-lg text-xs font-medium shadow hover:bg-[#16a34a] transition-colors">{isBn ? 'মানচিত্র দেখুন' : 'View Map'}</button>
-              </div>
-            )}
-
-            {/* Map Container */}
-            <div ref={mapContainerRef} className="rounded-xl overflow-hidden shadow-lg border border-white/60 bg-gray-100">
+          <motion.div variants={fadeUp} className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+            <h3 className="text-2xl font-bold text-green-950 mb-6">{isBn ? 'স্থানীয় ঝুঁকি মানচিত্র' : 'Local Risk Map'}</h3>
+            <div ref={mapContainerRef} className="rounded-2xl overflow-hidden border border-gray-200">
               <div id="local-risk-map" style={{ width: '100%', height: 450 }} />
             </div>
-
-            {/* Tip */}
-            <p className="mt-1.5 text-[10px] text-center text-[#8b7355]">
-              💡 {isBn ? 'মার্কারে ক্লিক করে বিস্তারিত দেখুন' : 'Click markers for details'}
-            </p>
-
           </motion.div>
-
         </motion.div>
       </div>
     </section>
