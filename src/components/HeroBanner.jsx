@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
 import heroBg from '../assets/bg.png';
+import { Button } from './common/Button';
 
 export default function HeroBanner() {
   const bgImage = `linear-gradient(180deg, rgba(2, 20, 12, 0.35), rgba(4, 10, 6, 0.55)), url(${heroBg})`;
@@ -59,13 +60,13 @@ export default function HeroBanner() {
           </motion.p>
 
           <motion.div className="flex gap-5 items-center" initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}>
-            <button className="py-3 px-6 rounded-[28px] font-bold inline-flex items-center gap-2.5 bg-gradient-to-r from-[#7ef37d] to-[#34c24b] text-[#06260c] shadow-[0_12px_36px_rgba(46,125,50,0.18)]">
+            <Button variant="primary" onClick={() => {}}>
               {isBn ? 'শুরু করুন' : 'Get Started'} <span className="font-extrabold">→</span>
-            </button>
+            </Button>
 
-            <button className="py-3 px-6 rounded-[28px] font-bold inline-flex items-center gap-2.5 bg-white/6 text-white border border-white/12">
+            <Button variant="secondary" onClick={() => {}}>
               {isBn ? 'আরও জানুন' : 'Learn More'}
-            </button>
+            </Button>
           </motion.div>
         </motion.div>
 

@@ -1,3 +1,4 @@
+import { Button } from '../components/common/Button';
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -46,7 +47,9 @@ const Login = () => {
             <Link to="/forgot" className="text-[#009e5c] font-semibold no-underline">{isBn ? 'পাসওয়ার্ড ভুলে গেছেন?' : 'Forgot Password?'}</Link>
           </div>
 
-          <button type="submit" className="w-full bg-[#009e5c] text-white font-bold text-base rounded-[14px] py-3 mb-4 shadow-[0_6px_18px_rgba(0,0,0,0.08)]">{isBn ? 'ড্যাশবোর্ডে লগইন করুন' : 'Login to Dashboard'}</button>
+          <Button variant="primary" type="submit" className="w-full">
+            {isBn ? 'ড্যাশবোর্ডে লগইন করুন' : 'Login to Dashboard'}
+          </Button>
         </form>
 
         <div className="text-[#075c3c] font-medium mb-3">{isBn ? 'অ্যাকাউন্ট নেই?' : "Don't have an account?"} <Link to="/register" className="text-[#009e5c] font-semibold underline">{isBn ? 'বিনামূল্যে সাইন আপ করুন' : 'Sign Up Free'}</Link></div>

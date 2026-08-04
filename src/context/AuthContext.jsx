@@ -43,7 +43,9 @@ export const AuthProvider = ({ children }) => {
       if (ok) {
         if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);
         if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-        setUser(data?.user || data?.data || { email: payload.email || payload.username });
+        const userData = data?.user || data?.data || { email: payload.email || payload.username };
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
         setMessage(data?.message || 'Logged in successfully');
         setLoading(false);
         return { ok: true, data };
@@ -73,6 +75,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('selectedUpazila');
+        localStorage.removeItem('user');
         setUser(null);
         setMessage('Logged out successfully');
         setLoading(false);
@@ -82,6 +85,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('selectedUpazila');
+        localStorage.removeItem('user');
         setUser(null);
         setMessage(status === 401 ? 'Logged out (token invalid)' : 'Logged out locally');
         setLoading(false);
@@ -94,6 +98,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('selectedUpazila');
+      localStorage.removeItem('user');
       setUser(null);
       setMessage('Logged out locally (network error)');
       setLoading(false);
@@ -126,19 +131,37 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const tryRestore = async () => {
+      // 1. Try to restore from localStorage first
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          console.error("Failed to parse stored user", e);
+        }
+      }
+
+      // 2. Then verify/refresh from server
       const accessToken = localStorage.getItem('accessToken');
-      if (!accessToken) return;
+      if (!accessToken) {
+          setUser(null);
+          return;
+      }
       try {
         const { ok, data } = await api.get('/user/me', { headers: { Authorization: `Bearer ${accessToken}` } });
-        if (ok && data && data.data) {
-          setUser(data.data);
+        if (ok && data) {
+          const userData = data.data || data; // Handle both cases for API response structure
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData)); // Sync with server
         } else {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          setUser(null);
         }
       } catch (err) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        console.error("Failed to verify user", err);
+        // Do not clear storage immediately on network error, keep current state (if parsed from local)
       }
     };
     tryRestore();

@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from '../services/api';
 import BanglaVoice from '../components/BanglaVoice';
+import { RiskBadge } from '../components/common/RiskBadge';
 import { CROP_TYPES, STORAGE_TYPES, DIVISIONS, DISTRICTS_BY_DIVISION } from '../data/formOptions';
 
 // Translations
@@ -531,7 +532,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5FFF6] px-8 py-8 mt-20">
+    <div className="min-h-screen bg-[#F5FFF6] px-4 py-8 mt-20 max-w-[1400px] mx-auto">
       {/* Header */}
       <div className="mb-6">
         <div className="text-sm text-green-600">
@@ -593,7 +594,7 @@ export default function Dashboard() {
             variants={fadeUp}
             initial="hidden"
             animate="show"
-            className="bg-gradient-to-b from-[#0b6d3d] to-[#067444] text-white rounded-2xl p-6 shadow-[0_30px_60px_rgba(7,96,50,0.08)]"
+            className="bg-gradient-to-br from-[#0b6d3d] to-[#067444] text-white rounded-3xl p-8 shadow-xl shadow-green-900/10"
           >
             <div className="flex justify-between items-start">
               <div>
@@ -607,18 +608,18 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mt-6">
-              <div className="bg-white/8 rounded-xl p-4">
-                <div className="text-2xl font-bold">{weather.temp}</div>
-                <div className="text-xs opacity-90 mt-1">{txt.temperature}</div>
+            <div className="grid grid-cols-3 gap-6 mt-8">
+              <div className="bg-white/10 rounded-2xl p-5 backdrop-blur-sm border border-white/10">
+                <div className="text-3xl font-bold">{weather.temp}</div>
+                <div className="text-xs opacity-80 mt-1 uppercase tracking-wider">{txt.temperature}</div>
               </div>
-              <div className="bg-white/8 rounded-xl p-4">
-                <div className="text-2xl font-bold">{weather.humidity}</div>
-                <div className="text-xs opacity-90 mt-1">{txt.humidity}</div>
+              <div className="bg-white/10 rounded-2xl p-5 backdrop-blur-sm border border-white/10">
+                <div className="text-3xl font-bold">{weather.humidity}</div>
+                <div className="text-xs opacity-80 mt-1 uppercase tracking-wider">{txt.humidity}</div>
               </div>
-              <div className="bg-white/8 rounded-xl p-4">
-                <div className="text-2xl font-bold">{weather.rainfall}</div>
-                <div className="text-xs opacity-90 mt-1">{txt.rainfall}</div>
+              <div className="bg-white/10 rounded-2xl p-5 backdrop-blur-sm border border-white/10">
+                <div className="text-3xl font-bold">{weather.rainfall}</div>
+                <div className="text-xs opacity-80 mt-1 uppercase tracking-wider">{txt.rainfall}</div>
               </div>
             </div>
 
@@ -1181,30 +1182,4 @@ export default function Dashboard() {
 }
 
 /* Small inline helper component used above */
-function RiskBadge({ level, lang }) {
-  const lvl = (level || "low").toString().toLowerCase();
-  const labels = {
-    high: { en: "High", bn: "উচ্চ" },
-    medium: { en: "Medium", bn: "মাঝারি" },
-    low: { en: "Low", bn: "নিম্ন" },
-  };
-  const label = labels[lvl] || labels.low;
-  
-  if (lvl === "high")
-    return (
-      <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 text-sm font-semibold">
-        {lang === 'bn' ? label.bn : label.en}
-      </span>
-    );
-  if (lvl === "medium")
-    return (
-      <span className="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-sm font-semibold">
-        {lang === 'bn' ? label.bn : label.en}
-      </span>
-    );
-  return (
-    <span className="px-3 py-1 rounded-full bg-green-50 text-green-800 text-sm font-semibold">
-      {lang === 'bn' ? label.bn : label.en}
-    </span>
-  );
-}
+/* Removed RiskBadge as it has been moved to a separate file */

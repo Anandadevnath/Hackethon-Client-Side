@@ -69,8 +69,8 @@ export default function CrisisSection() {
     const generateMockPoints = (count = 12) => {
       const points = [];
       for (let i = 0; i < count; i++) {
-        const lat = center.lat + (Math.random() - 0.5) * 0.08;
-        const lng = center.lng + (Math.random() - 0.5) * 0.08;
+        const lat = center.lat + (Math.random() - 0.5) * 0.04;
+        const lng = center.lng + (Math.random() - 0.5) * 0.04;
         const risk = riskLevels[Math.floor(Math.random() * riskLevels.length)];
         const crop = cropsBn[Math.floor(Math.random() * cropsBn.length)];
         const hoursAgo = Math.floor(Math.random() * 72);
@@ -280,7 +280,7 @@ export default function CrisisSection() {
 
             {/* Map Container */}
             <div ref={mapContainerRef} className="rounded-xl overflow-hidden shadow-lg border border-white/60 bg-gray-100">
-              <div id="local-risk-map" style={{ width: '100%', height: 280 }} />
+              <div id="local-risk-map" style={{ width: '100%', height: 450 }} />
             </div>
 
             {/* Tip */}
