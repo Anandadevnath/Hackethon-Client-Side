@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import logoEn from "../assets/harvest-en-removebg-preview.png";
 import logoBn from "../assets/harvest-bn-removebg-preview.png";
 import { useLanguage } from "../context/LanguageContext";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Globe, Info, LayoutGrid, User, LogOut, Menu, X, Sparkles } from 'lucide-react';
-import { Button } from './common/Button';
+import { Globe, Menu, X } from 'lucide-react';
+import { useScroll, useOutsideClick } from "../hooks/useNavbarHooks";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -13,33 +13,16 @@ const Navbar = () => {
   const { lang, setLang } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+
   const wrapperRef = useRef(null);
+  const scrolled = useScroll();
+  useOutsideClick(wrapperRef, () => setMenuOpen(false));
 
   const handleLogout = async () => {
     setMenuOpen(false);
     await logout();
     navigate('/');
   };
-
-  useEffect(() => {
-    const onDocClick = (e) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const navClasses = scrolled
     ? 'fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md shadow-sm'

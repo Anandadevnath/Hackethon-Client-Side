@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useRiskMap } from "../hooks/useRiskMap";
+import { StatCard } from "./common/StatCard";
 import { useAuth } from "../context/AuthContext";
-import districtCenters from "../data/district-centers";
 import { useLanguage } from "../context/LanguageContext";
 import { motion, useAnimation } from "framer-motion";
+import districtCenters from "../data/district-centers";
 
 const container = {
   hidden: {},
@@ -31,12 +33,10 @@ const toBanglaDigits = (num) => String(num).replace(/\d/g, (d) => "০১২৩�
 export default function CrisisSection() {
   const { lang } = useLanguage();
   const isBn = lang === "bn";
-  const mapRef = useRef(null);
-  const mapContainerRef = useRef(null);
-  const markersRef = useRef([]);
   const { user } = useAuth();
   const controls = useAnimation();
-  const [alerts, setAlerts] = useState([]);
+  const { mapRef, mapContainerRef, alerts, setAlerts } = useRiskMap(user);
+  const markersRef = useRef([]);
 
   useEffect(() => {
     controls.start("show");

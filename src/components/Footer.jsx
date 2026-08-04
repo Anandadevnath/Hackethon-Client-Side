@@ -1,8 +1,8 @@
-import React from "react";
 import { motion } from "framer-motion";
 import logoEn from "../assets/harvest-en-removebg-preview.png";
 import logoBn from "../assets/harvest-bn-removebg-preview.png";
 import { useLanguage } from '../context/LanguageContext';
+import { FooterSection } from './common/FooterSection';
 
 export default function Footer() {
   const { lang } = useLanguage();
@@ -59,59 +59,19 @@ export default function Footer() {
 
         {/* LINKS COLUMN */}
         <div className="flex-1 w-full md:min-w-[280px] min-w-0 flex flex-col md:flex-row md:justify-between gap-6 md:gap-12">
+          <FooterSection title={isBn ? 'দ্রুত লিঙ্ক' : 'Quick Links'} items={isBn ? ["হোম", "আমাদের সম্পর্কে", "ড্যাশবোর্ড", "লগইন"] : ["Home", "About", "Dashboard", "Login"]} />
+          <FooterSection title={isBn ? 'সম্পদ' : 'Resources'} items={isBn ? ["প্রশিক্ষণ ভিডিও", "সাহায্য কেন্দ্র", "প্রশ্নাবলি", "কমিউনিটি ফোরাম"] : ["Training Videos", "Help Center", "FAQs", "Community Forum"]} />
+          <FooterSection title={isBn ? 'আইনি' : 'Legal'} items={isBn ? ["গোপনীয়তা নীতি", "পরিষেবা শর্ত", "ডেটা নিরাপত্তা"] : ["Privacy Policy", "Terms of Service", "Data Security"]} />
 
-          {[
-            {
-              title: isBn ? 'দ্রুত লিঙ্ক' : 'Quick Links',
-              items: isBn ? ["হোম", "আমাদের সম্পর্কে", "ড্যাশবোর্ড", "লগইন"] : ["Home", "About", "Dashboard", "Login"],
-            },
-            {
-              title: isBn ? 'সম্পদ' : 'Resources',
-              items: isBn ? ["প্রশিক্ষণ ভিডিও", "সাহায্য কেন্দ্র", "প্রশ্নাবলি", "কমিউনিটি ফোরাম"] : ["Training Videos", "Help Center", "FAQs", "Community Forum"],
-            },
-            {
-              title: isBn ? 'আইনি' : 'Legal',
-              items: isBn ? ["গোপনীয়তা নীতি", "পরিষেবা শর্ত", "ডেটা নিরাপত্তা"] : ["Privacy Policy", "Terms of Service", "Data Security"],
-            },
-          ].map((section, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
-            >
-              <div className="text-xl font-semibold text-[#fffbe6] mb-3">{section.title}</div>
-              {section.items.map((item, i) => (
-                <a
-                  key={i}
-                  className="block text-[#e6ffe6] mb-2 hover:text-[#0af58a] transition-colors"
-                  href="#"
-                >
-                  {item}
-                </a>
-              ))}
-            </motion.div>
-          ))}
-
-          {/* Partners */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
-            <div className="text-xl font-semibold mb-3">Partners</div>
+          <FooterSection title="Partners">
             <div className="flex flex-col gap-2">
               {["DAE", "FAO", "UNDP"].map((p, i) => (
-                <motion.button
-                  key={i}
-                  whileHover={{ scale: 1.1 }}
-                  className="bg-white/10 text-[#fffbe6] border border-white/20 rounded px-3 py-1 text-sm"
-                >
+                <motion.button key={i} whileHover={{ scale: 1.1 }} className="bg-white/10 text-[#fffbe6] border border-white/20 rounded px-3 py-1 text-sm">
                   {p}
                 </motion.button>
               ))}
             </div>
-          </motion.div>
+          </FooterSection>
         </div>
       </div>
 

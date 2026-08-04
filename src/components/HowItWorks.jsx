@@ -1,6 +1,6 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from '../context/LanguageContext';
+import { HowItWorksStep } from "./common/HowItWorksStep";
 import img1 from '../assets/1.png';
 import img2 from '../assets/2.jpg';
 import img3 from '../assets/3.png';
@@ -105,40 +105,16 @@ export default function HowItWorks() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-16"
         >
           {steps.map((step) => (
-            <motion.div
+            <HowItWorksStep
               key={step.id}
-              variants={fadeUp}
-              whileHover={{ scale: 1.05, y: -5 }}
-              transition={{ type: "spring", stiffness: 120 }}
-              className="bg-white rounded-2xl shadow-[0_15px_40px_rgba(0,70,40,0.10)] overflow-hidden border border-[#e3f7ec]"
-            >
-              {/* Image */}
-              <div
-                className="h-40 bg-cover bg-center relative"
-                style={{ backgroundImage: `url(${step.img})` }}
-              >
-                <div className="absolute right-3 top-3 w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center text-[#0d6b3c] font-bold text-lg">
-                  {step.id}
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <div className="text-3xl mb-2">{step.icon}</div>
-                <h3 className="font-bold text-[18px] text-[#0c3e25] mb-1">
-                  {isBn ? (
-                    step.id === 1 ? 'ডেটা সংগ্রহ' : step.id === 2 ? 'স্মার্ট সতর্কতা' : step.id === 3 ? 'কার্যকর ব্যবস্থা' : 'খাদ্য সংরক্ষণ'
-                  ) : (
-                    step.title
-                  )}
-                </h3>
-                <p className="text-[#577a63] text-sm leading-6">{isBn ? (
-                  step.id === 1 ? 'রিয়েল-টাইমে সংরক্ষণ অবস্থান, তাপমাত্রা ও আর্দ্রতা পর্যবেক্ষণ' : step.id === 2 ? 'যখন শর্ত ক্ষতির ঝুঁকি সৃষ্টি করে তখন তাৎক্ষণিক এলার্ট পান' : step.id === 3 ? 'ক্ষয় রোধে গাইড করা ধাপগুলি অনুসরণ করুন' : 'বর্জ্য কমান, আয় বাড়ান এবং আরও পরিবারকে খাদ্য সরবরাহ করুন'
-                ) : (
-                  step.desc
-                )}</p>
-              </div>
-            </motion.div>
+              {...step}
+              title={isBn ? (
+                step.id === 1 ? 'ডেটা সংগ্রহ' : step.id === 2 ? 'স্মার্ট সতর্কতা' : step.id === 3 ? 'কার্যকর ব্যবস্থা' : 'খাদ্য সংরক্ষণ'
+              ) : step.title}
+              desc={isBn ? (
+                step.id === 1 ? 'রিয়েল-টাইমে সংরক্ষণ অবস্থান, তাপমাত্রা ও আর্দ্রতা পর্যবেক্ষণ' : step.id === 2 ? 'যখন শর্ত ক্ষতির ঝুঁকি সৃষ্টি করে তখন তাৎক্ষণিক এলার্ট পান' : step.id === 3 ? 'ক্ষয় রোধে গাইড করা ধাপগুলি অনুসরণ করুন' : 'বর্জ্য কমান, আয় বাড়ান এবং আরও পরিবারকে খাদ্য সরবরাহ করুন'
+              ) : step.desc}
+            />
           ))}
         </motion.div>
 

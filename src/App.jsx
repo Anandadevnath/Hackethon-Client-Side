@@ -7,16 +7,18 @@ import StatsSection from "./components/StatsSection";
 import CrisisSection from "./components/CrisisSection";
 import HowItWorks from "./components/HowItWorks";
 import CallToAction from "./components/CallToAction";
-import About from "./pages/About";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import Verify from "./pages/Verify";
-import ResetPassword from "./pages/ResetPassword";
-import Profile from "./pages/Profile";
-import Dashboard from "./pages/Dashboard";
-import Warnings from "./pages/Warnings";
-import ScanCrop from "./pages/ScanCrop";
+import { lazy, Suspense } from "react";
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const Verify = lazy(() => import("./pages/Verify"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Register = lazy(() => import("./pages/Register"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Warnings = lazy(() => import("./pages/Warnings"));
+const ScanCrop = lazy(() => import("./pages/ScanCrop"));
+const About = lazy(() => import("./pages/About"));
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "./context/AuthContext";
@@ -27,32 +29,34 @@ function App() {
       <Router>
         <Navbar />
         <Toaster position="top-right" />
-        <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot" element={<ForgotPassword />} />
-          <Route path="/verify" element={<Verify />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/warnings" element={<Warnings />} />
-          <Route path="/scan-crop" element={<ScanCrop />} />
-          <Route path="/about" element={<About />} />
-          {/* Add other routes here */}
-          <Route
-            path="/"
-            element={
-              <>
-                <HeroBanner />
-                <FeaturesSection />
-                <StatsSection />
-                <CrisisSection />
-                <HowItWorks />
-                <CallToAction />
-              </>
-            }
-          />
-        </Routes>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot" element={<ForgotPassword />} />
+            <Route path="/verify" element={<Verify />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/warnings" element={<Warnings />} />
+            <Route path="/scan-crop" element={<ScanCrop />} />
+            <Route path="/about" element={<About />} />
+            {/* Add other routes here */}
+            <Route
+              path="/"
+              element={
+                <>
+                  <HeroBanner />
+                  <FeaturesSection />
+                  <StatsSection />
+                  <CrisisSection />
+                  <HowItWorks />
+                  <CallToAction />
+                </>
+              }
+            />
+          </Routes>
+        </Suspense>
         <Footer />
       </Router>
     </AuthProvider>
