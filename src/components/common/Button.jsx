@@ -17,9 +17,9 @@ export const Button = ({
   const baseClasses = "rounded-[28px] font-bold transition-all duration-300 flex items-center justify-center";
 
   const variants = {
-    primary: "bg-white text-[#067e49] shadow-[0_18px_40px_rgba(0,0,0,0.2)] hover:scale-105 disabled:opacity-50 disabled:hover:scale-100",
+    primary: "bg-[--color-brand-button-primary] text-[--color-brand-secondary] shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100",
     secondary: "bg-transparent text-white border border-white/40 hover:bg-white/10 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100",
-    outline: "border border-[#067e49] text-[#067e49] hover:bg-[#067e49] hover:text-white disabled:opacity-50",
+    outline: "border border-[--color-brand-button-outline] text-[--color-brand-button-outline] hover:bg-[--color-brand-button-outline] hover:text-white disabled:opacity-50",
   };
 
   const sizes = {
