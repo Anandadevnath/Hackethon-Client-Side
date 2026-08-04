@@ -10,6 +10,8 @@ if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VIT
 async function request(path, { method = 'GET', headers = {}, body, params, credentials = true, ...opts } = {}) {
   const p = path && path.startsWith('/') ? path : `/${path || ''}`;
   let url = `${API_BASE}${p}`;
+  // Remove potential double slash
+  url = url.replace(/([^:]\/)\/+/g, "$1");
   if (params && typeof params === 'object') {
     const q = new URLSearchParams(params).toString();
     if (q) url += `?${q}`;
