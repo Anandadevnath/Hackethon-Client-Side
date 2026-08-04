@@ -45,8 +45,8 @@ export default function FeaturesSection() {
     <section className="relative py-20 px-4 bg-gradient-to-b from-[#e9fff4] via-[#f3fff9] to-[#e7ffee] overflow-hidden">
       {/* Soft Glowing Blobs */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
-        <div className="absolute top-10 left-10 w-60 h-60 bg-green-300/40 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-72 h-72 bg-emerald-300/40 rounded-full blur-[100px]"></div>
+        <div className="absolute top-10 left-10 w-96 h-96 bg-green-200/50 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-emerald-200/50 rounded-full blur-[150px]"></div>
       </div>
 
       <div className="max-w-[1300px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">

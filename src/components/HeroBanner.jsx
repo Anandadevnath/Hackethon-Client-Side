@@ -30,7 +30,7 @@ export default function HeroBanner() {
           }}
         >
           <div className="mb-4">
-            <span className="inline-block bg-[#0b6b3a]/20 text-[#e7fff0] text-sm px-3 py-1 rounded-full font-semibold shadow-[0_4px_14px_rgba(6,40,20,0.06)]">
+            <span className="inline-block bg-[#0b6b3a]/40 text-[#e7fff0] text-sm px-4 py-1.5 rounded-full font-semibold shadow-lg backdrop-blur-sm">
               {isBn ? 'Sustainable Farming Tech' : 'Sustainable Farming Tech'}
             </span>
           </div>
@@ -60,7 +60,7 @@ export default function HeroBanner() {
           </motion.p>
 
           <motion.div className="flex gap-5 items-center" initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}>
-            <Button variant="primary" onClick={() => {}}>
+            <Button variant="primary" className="bg-[#0b6b3a] hover:bg-[#095730] transition-colors shadow-lg px-8 py-3 rounded-xl text-lg font-bold" onClick={() => {}}>
               {isBn ? 'শুরু করুন' : 'Get Started'} <span className="font-extrabold">→</span>
             </Button>
 

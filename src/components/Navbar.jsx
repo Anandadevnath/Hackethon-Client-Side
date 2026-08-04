@@ -43,9 +43,9 @@ const Navbar = () => {
 
   const navClasses = scrolled
     ? 'fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md shadow-sm'
-    : 'absolute top-4 left-0 right-0 bg-transparent';
+    : 'absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent';
 
-  const textColor = 'text-green-800';
+  const textColor = scrolled ? 'text-green-800' : 'text-white';
 
   return (
     <nav className={`z-[9999] box-border transition-all duration-300 ${navClasses}`}>
