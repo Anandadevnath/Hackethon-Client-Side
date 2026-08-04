@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
+// ... rest of the file will need updates to use authService
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,11 +13,8 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setMessage('');
     try {
-      const { ok, data } = await api.post('/user/register', payload, { headers: { 'Content-Type': 'application/json' } });
+      const { ok, data } = await authService.register(payload);
       if (ok) {
-        // Do not auto-login after registration. Redirect user to login page instead.
-        // Some backends return tokens on register; we intentionally ignore them here
-        // so the user must explicitly login.
         setMessage(data?.message || 'Registered successfully');
         setLoading(false);
         return { ok: true, data };
@@ -41,7 +39,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setMessage('');
     try {
-      const { ok, data } = await api.post('/user/login', payload, { headers: { 'Content-Type': 'application/json' } });
+      const { ok, data } = await authService.login(payload);
       if (ok) {
         if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);
         if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
@@ -69,10 +67,8 @@ export const AuthProvider = ({ children }) => {
     setMessage('');
     try {
       const accessToken = localStorage.getItem('accessToken');
-      const headers = {};
-      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-      const { ok, status } = await api.post('/user/logout', null, { headers });
+      const { ok, status } = await authService.logout(accessToken);
       if (ok) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -82,8 +78,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return { ok: true };
       }
-      // If server responded with 401, or any non-ok, clear local session anyway
-      // This ensures the user is logged out locally even if remote logout failed
       if (status === 401 || status === 0 || !ok) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -97,7 +91,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return { ok: false };
     } catch (err) {
-      // Network/CORS error — clear local session so UI reflects logged out state
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('selectedUpazila');
@@ -113,10 +106,8 @@ export const AuthProvider = ({ children }) => {
     setMessage('');
     try {
       const accessToken = localStorage.getItem('accessToken');
-      const headers = { 'Content-Type': 'application/json' };
-      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-      const { ok, data } = await api.patch('/user/update', updates, { headers });
+      const { ok, data } = await authService.updateProfile(updates, accessToken);
       if (ok) {
         if (data?.data) setUser(data.data);
         setMessage(data?.message || 'Profile updated');

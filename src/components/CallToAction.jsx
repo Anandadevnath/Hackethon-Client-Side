@@ -1,12 +1,13 @@
 import React from "react";
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from "framer-motion";
+import { Button } from "./common/Button";
 
 export default function CallToAction() {
   const { lang } = useLanguage();
   const isBn = lang === 'bn';
   return (
-    <section className="relative overflow-hidden text-white 
+    <section className="relative overflow-hidden text-white
         bg-[linear-gradient(180deg,#0aa460_0%,#0a8f58_60%,#067e4b_100%)] py-24 px-4">
 
       {/* FLOATING WAVES BACKGROUND */}
@@ -40,25 +41,13 @@ export default function CallToAction() {
           transition={{ duration: 0.7 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
         >
-          {/* Button 1 */}
-          <motion.button
-            whileHover={{ scale: 1.06, boxShadow: "0px 20px 40px rgba(255,255,255,0.25)" }}
-            transition={{ type: "spring", stiffness: 180 }}
-            className="rounded-[28px] px-7 py-3 font-bold bg-white text-[#067e49] 
-            shadow-[0_18px_40px_rgba(0,0,0,0.2)] inline-flex items-center"
-          >
+          <Button variant="primary">
             <span className="mr-2">✨</span> {isBn ? 'এখনই শুরু করুন →' : 'Get Started Now →'}
-          </motion.button>
+          </Button>
 
-          {/* Button 2 */}
-          <motion.button
-            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.18)" }}
-            transition={{ type: "spring", stiffness: 180 }}
-            className="rounded-[28px] px-6 py-3 font-bold bg-transparent text-white 
-            border border-white/40"
-          >
+          <Button variant="secondary">
             {isBn ? 'আরও জানুন' : 'Learn More'}
-          </motion.button>
+          </Button>
         </motion.div>
 
         {/* DIVIDER */}
